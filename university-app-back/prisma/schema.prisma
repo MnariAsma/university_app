@@ -1,0 +1,480 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================
+// ENUMS
+// ============================================================
+
+enum Role {
+  ADMIN
+  ETUDIANT
+  ENSEIGNANT
+}
+
+enum TypeCours {
+  COURS
+  TD
+  TP
+}
+
+enum TypeSeance {
+  COURS
+  TD
+  TP
+  EXAMEN
+}
+
+enum StatutAbsence {
+  ABSENT
+  PRESENT
+  RETARD
+  JUSTIFIE
+}
+
+enum StatutExamen {
+  PLANIFIE
+  EN_COURS
+  TERMINE
+  ANNULE
+}
+
+enum TypeEvenement {
+  RENTREE
+  CONGE
+  EXAMEN
+  RATTRAPAGE
+  AUTRE
+}
+
+enum StatutNote {
+  PROVISOIRE
+  DEFINITIVE
+}
+
+// ============================================================
+// AUTHENTIFICATION & UTILISATEURS
+// ============================================================
+
+model Utilisateur {
+  id         String   @id @default(cuid())
+  email      String   @unique
+  motDePasse String
+  role       Role
+  nom        String
+  prenom     String
+  telephone  String?
+  photo      String?
+  actif      Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  etudiant   Etudiant?
+  enseignant Enseignant?
+  admin      Admin?
+
+  @@map("utilisateurs")
+}
+
+// ============================================================
+// ADMIN
+// ============================================================
+
+model Admin {
+  id            String      @id @default(cuid())
+  utilisateurId String      @unique
+  utilisateur   Utilisateur @relation(fields: [utilisateurId], references: [id], onDelete: Cascade)
+
+  actualites           Actualite[]
+  examens              Examen[]
+  seances              Seance[]
+  evenementsCalendrier EvenementCalendrier[]
+
+  @@map("admins")
+}
+
+// ============================================================
+// STRUCTURE UNIVERSITAIRE
+// ============================================================
+
+model Departement {
+  id          String   @id @default(cuid())
+  nom         String   @unique
+  code        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  filieres    Filiere[]
+  enseignants Enseignant[]
+  etudiants   Etudiant[]
+
+  @@map("departements")
+}
+
+model Filiere {
+  id            String      @id @default(cuid())
+  nom           String
+  code          String      @unique
+  description   String?
+  niveau        String      // Licence, Master, Doctorat...
+  departementId String
+  departement   Departement @relation(fields: [departementId], references: [id])
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  groupes   Groupe[]
+  matieres  Matiere[]
+  etudiants Etudiant[]
+  examens   Examen[]
+
+  @@map("filieres")
+}
+
+model Groupe {
+  id        String   @id @default(cuid())
+  nom       String
+  code      String   @unique
+  filiereId String
+  filiere   Filiere  @relation(fields: [filiereId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  etudiants Etudiant[]
+  seances   Seance[]
+
+  @@map("groupes")
+}
+
+// ============================================================
+// ETUDIANT
+// ============================================================
+
+model Etudiant {
+  id            String      @id @default(cuid())
+  matricule     String      @unique
+  utilisateurId String      @unique
+  utilisateur   Utilisateur @relation(fields: [utilisateurId], references: [id], onDelete: Cascade)
+  departementId String
+  departement   Departement @relation(fields: [departementId], references: [id])
+  filiereId     String
+  filiere       Filiere     @relation(fields: [filiereId], references: [id])
+  groupeId      String
+  groupe        Groupe      @relation(fields: [groupeId], references: [id])
+  anneeScolaire String
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  absences           Absence[]
+  notes              Note[]
+  inscriptionsExamen InscriptionExamen[]
+
+  @@map("etudiants")
+}
+
+// ============================================================
+// ENSEIGNANT
+// ============================================================
+
+model Enseignant {
+  id            String      @id @default(cuid())
+  matricule     String      @unique
+  utilisateurId String      @unique
+  utilisateur   Utilisateur @relation(fields: [utilisateurId], references: [id], onDelete: Cascade)
+  departementId String
+  departement   Departement @relation(fields: [departementId], references: [id])
+  grade         String?
+  specialite    String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  cours              Cours[]
+  seances            Seance[]
+  matiereEnseignees  MatiereEnseignant[]
+  notes              Note[]
+
+  @@map("enseignants")
+}
+
+// ============================================================
+// MATIERES
+// ============================================================
+
+model Matiere {
+  id            String   @id @default(cuid())
+  nom           String
+  code          String   @unique
+  description   String?
+  coefficient   Float    @default(1)
+  volumeHoraire Int?
+  filiereId     String
+  filiere       Filiere  @relation(fields: [filiereId], references: [id])
+  semestre      Int
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  enseignants MatiereEnseignant[]
+  cours       Cours[]
+  seances     Seance[]
+  absences    Absence[]
+  notes       Note[]
+  examens     Examen[]
+
+  @@map("matieres")
+}
+
+model MatiereEnseignant {
+  id            String     @id @default(cuid())
+  matiereId     String
+  matiere       Matiere    @relation(fields: [matiereId], references: [id])
+  enseignantId  String
+  enseignant    Enseignant @relation(fields: [enseignantId], references: [id])
+  typeCours     TypeCours  @default(COURS)
+  anneeScolaire String
+
+  @@unique([matiereId, enseignantId, typeCours, anneeScolaire])
+  @@map("matieres_enseignants")
+}
+
+// ============================================================
+// COURS (ressources publiées par l'enseignant)
+// ============================================================
+
+model Cours {
+  id           String     @id @default(cuid())
+  titre        String
+  description  String?
+  contenu      String?
+  fichierUrl   String?
+  type         TypeCours  @default(COURS)
+  matiereId    String
+  matiere      Matiere    @relation(fields: [matiereId], references: [id])
+  enseignantId String
+  enseignant   Enseignant @relation(fields: [enseignantId], references: [id])
+  publie       Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@map("cours")
+}
+
+// ============================================================
+// EMPLOI DU TEMPS — SEANCES
+// ============================================================
+
+model Salle {
+  id       String  @id @default(cuid())
+  nom      String  @unique
+  capacite Int?
+  batiment String?
+
+  seances Seance[]
+  examens Examen[]
+
+  @@map("salles")
+}
+
+model Seance {
+  id           String     @id @default(cuid())
+  titre        String?
+  type         TypeSeance @default(COURS)
+  matiereId    String
+  matiere      Matiere    @relation(fields: [matiereId], references: [id])
+  enseignantId String
+  enseignant   Enseignant @relation(fields: [enseignantId], references: [id])
+  groupeId     String
+  groupe       Groupe     @relation(fields: [groupeId], references: [id])
+  salleId      String?
+  salle        Salle?     @relation(fields: [salleId], references: [id])
+  adminId      String
+  admin        Admin      @relation(fields: [adminId], references: [id])
+  dateDebut    DateTime
+  dateFin      DateTime
+  recurrente   Boolean    @default(false)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  absences Absence[]
+
+  @@map("seances")
+}
+
+// ============================================================
+// ABSENCES & PRESENCES
+// ============================================================
+
+model Absence {
+  id            String        @id @default(cuid())
+  etudiantId    String
+  etudiant      Etudiant      @relation(fields: [etudiantId], references: [id])
+  matiereId     String
+  matiere       Matiere       @relation(fields: [matiereId], references: [id])
+  seanceId      String
+  seance        Seance        @relation(fields: [seanceId], references: [id])
+  statut        StatutAbsence @default(ABSENT)
+  justification String?
+  justifiee     Boolean       @default(false)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@unique([etudiantId, seanceId])
+  @@map("absences")
+}
+
+// ============================================================
+// NOTES
+// ============================================================
+
+model Note {
+  id             String     @id @default(cuid())
+  etudiantId     String
+  etudiant       Etudiant   @relation(fields: [etudiantId], references: [id])
+  matiereId      String
+  matiere        Matiere    @relation(fields: [matiereId], references: [id])
+  enseignantId   String
+  enseignant     Enseignant @relation(fields: [enseignantId], references: [id])
+  examenId       String?
+  examen         Examen?    @relation(fields: [examenId], references: [id])
+  valeur         Float
+  typeEvaluation String     // "Contrôle", "Examen Final", "TP", "Partiel"
+  statut         StatutNote @default(PROVISOIRE)
+  commentaire    String?
+  anneeScolaire  String
+  semestre       Int
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  @@map("notes")
+}
+
+// ============================================================
+// EXAMENS
+// ============================================================
+
+model Examen {
+  id            String       @id @default(cuid())
+  titre         String
+  description   String?
+  matiereId     String
+  matiere       Matiere      @relation(fields: [matiereId], references: [id])
+  filiereId     String
+  filiere       Filiere      @relation(fields: [filiereId], references: [id])
+  adminId       String
+  admin         Admin        @relation(fields: [adminId], references: [id])
+  salleId       String?
+  salle         Salle?       @relation(fields: [salleId], references: [id])
+  dateDebut     DateTime
+  dateFin       DateTime
+  statut        StatutExamen @default(PLANIFIE)
+  semestre      Int
+  anneeScolaire String
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  inscriptions InscriptionExamen[]
+  notes        Note[]
+
+  @@map("examens")
+}
+
+model InscriptionExamen {
+  id         String   @id @default(cuid())
+  etudiantId String
+  etudiant   Etudiant @relation(fields: [etudiantId], references: [id])
+  examenId   String
+  examen     Examen   @relation(fields: [examenId], references: [id])
+  createdAt  DateTime @default(now())
+
+  @@unique([etudiantId, examenId])
+  @@map("inscriptions_examens")
+}
+
+// ============================================================
+// ACTUALITES
+// ============================================================
+
+model Actualite {
+  id            String    @id @default(cuid())
+  titre         String
+  contenu       String
+  imageUrl      String?
+  adminId       String
+  admin         Admin     @relation(fields: [adminId], references: [id])
+  publiee       Boolean   @default(true)
+  departementId String?   // null = visible par tous
+  filiereId     String?   // null = visible par tous
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("actualites")
+}
+
+// ============================================================
+// CALENDRIER UNIVERSITAIRE
+// ============================================================
+
+model EvenementCalendrier {
+  id          String        @id @default(cuid())
+  titre       String
+  description String?
+  type        TypeEvenement @default(AUTRE)
+  dateDebut   DateTime
+  dateFin     DateTime
+  adminId     String
+  admin       Admin         @relation(fields: [adminId], references: [id])
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@map("evenements_calendrier")
+}
+
+// ============================================================
+// ANNEE SCOLAIRE
+// ============================================================
+
+model AnneeScolaire {
+  id        String   @id @default(cuid())
+  libelle   String   @unique // "2024-2025"
+  dateDebut DateTime
+  dateFin   DateTime
+  active    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@map("annees_scolaires")
+}
+
+
+enum TypeNotification {
+  INFO
+  ALERTE
+  RAPPEL
+  NOTE
+  ABSENCE
+  COURS
+  EXAMEN
+}
+
+model Notification {
+  id              String           @id @default(cuid())
+  titre           String
+  message         String
+  type            TypeNotification @default(INFO)
+  utilisateurId   String
+  utilisateur     Utilisateur      @relation(fields: [utilisateurId], references: [id], onDelete: Cascade)
+  lue             Boolean          @default(false)
+  lienRedirection String?          // ex: "/cours/123"
+  createdAt       DateTime         @default(now())
+
+  @@map("notifications")
+}
