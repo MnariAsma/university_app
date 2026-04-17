@@ -63,23 +63,24 @@ enum GradeStatus {
 // ============================================================
 
 model User {
-  id         String   @id @default(cuid())
-  email      String   @unique
-  password   String
-  role       Role
-  firstName  String
-  lastName   String
-  phone      String?
-  photo      String?
-  active     Boolean  @default(true)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  role      Role
+  firstName String
+  lastName  String
+  phone     String?
+  photo     String?
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  student    Student?
-  teacher    Teacher?
-  admin      Admin?
+  student Student?
+  teacher Teacher?
+  admin   Admin?
 
   notifications Notification[]
+
   @@map("users")
 }
 
@@ -88,13 +89,13 @@ model User {
 // ============================================================
 
 model Admin {
-  id            String      @id @default(cuid())
-  userId        String      @unique
-  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  news          News[]
-  exams         Exam[]
-  sessions      Session[]
+  news           News[]
+  exams          Exam[]
+  sessions       Session[]
   calendarEvents CalendarEvent[]
 
   @@map("admins")
@@ -132,57 +133,57 @@ model Department {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  programs    Program[]
-  teachers    Teacher[]
-  students    Student[]
-  news        News[]
+  programs Program[]
+  teachers Teacher[]
+  students Student[]
+  news     News[]
 
   @@map("departments")
 }
 
 model Program {
-  id            String      @id @default(cuid())
-  name          String      // Filière, ex: "Ingénierie Informatique"
-  code          String      @unique
-  description   String?
-  level         String      
-  departmentId  String
-  department    Department  @relation(fields: [departmentId], references: [id])
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  id           String     @id @default(cuid())
+  name         String // Filière, ex: "Ingénierie Informatique"
+  code         String     @unique
+  description  String?
+  level        String
+  departmentId String
+  department   Department @relation(fields: [departmentId], references: [id])
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
 
-  levels        Level[]
-  subjects      Subject[]
-  students      Student[]
-  exams         Exam[]
-  news          News[]
+  levels   Level[]
+  subjects Subject[]
+  students Student[]
+  exams    Exam[]
+  news     News[]
 
   @@map("programs")
 }
 
 model Level {
-  id         String  @id @default(cuid())
-  name       String 
-  order      Int
+  id    String @id @default(cuid())
+  name  String
+  order Int
 
-  programId  String
-  program    Program @relation(fields: [programId], references: [id])
+  programId String
+  program   Program @relation(fields: [programId], references: [id])
 
-  groups     Group[]
+  groups Group[]
 
   @@map("levels")
 }
 
 model Group {
-  id        String  @id @default(cuid())
-  name      String
-  code      String  @unique
+  id   String @id @default(cuid())
+  name String
+  code String @unique
 
-  levelId   String
-  level     Level   @relation(fields: [levelId], references: [id])
+  levelId String
+  level   Level  @relation(fields: [levelId], references: [id])
 
-  students  Student[]
-  sessions  Session[]
+  students Student[]
+  sessions Session[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -195,26 +196,26 @@ model Group {
 // ============================================================
 
 model Student {
-  id            String      @id @default(cuid())
-  matricule     String      @unique
-  userId        String      @unique
-  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  departmentId  String
-  department    Department  @relation(fields: [departmentId], references: [id])
-  programId     String
-  program       Program     @relation(fields: [programId], references: [id])
-  groupId       String
-  group         Group       @relation(fields: [groupId], references: [id])
-  
+  id           String     @id @default(cuid())
+  matricule    String     @unique
+  userId       String     @unique
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  departmentId String
+  department   Department @relation(fields: [departmentId], references: [id])
+  programId    String
+  program      Program    @relation(fields: [programId], references: [id])
+  groupId      String
+  group        Group      @relation(fields: [groupId], references: [id])
+
   academicYearId String
   academicYear   AcademicYear @relation(fields: [academicYearId], references: [id])
-  
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
 
-  absences      Absence[]
-  grades        Grade[]
-  examRegs      ExamRegistration[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  absences Absence[]
+  grades   Grade[]
+  examRegs ExamRegistration[]
 
   @@map("students")
 }
@@ -224,22 +225,22 @@ model Student {
 // ============================================================
 
 model Teacher {
-  id            String      @id @default(cuid())
-  matricule     String      @unique
-  userId        String      @unique
-  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  departmentId  String
-  department    Department  @relation(fields: [departmentId], references: [id])
-  grade         String?
-  specialty     String?
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  id           String     @id @default(cuid())
+  matricule    String     @unique
+  userId       String     @unique
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  departmentId String
+  department   Department @relation(fields: [departmentId], references: [id])
+  grade        String?
+  specialty    String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
 
-  courses       Course[]
-  sessions      Session[]
-  subjectLinks  TeacherSubject[]
-  grades        Grade[]
-  exams         Exam[]
+  courses      Course[]
+  sessions     Session[]
+  subjectLinks TeacherSubject[]
+  grades       Grade[]
+  exams        Exam[]
 
   @@map("teachers")
 }
@@ -249,38 +250,38 @@ model Teacher {
 // ============================================================
 
 model Subject {
-  id            String   @id @default(cuid())
-  name          String
-  code          String   @unique
-  description   String?
-  coefficient   Float    @default(1)
-  hours         Int?
-  programId     String
-  program       Program  @relation(fields: [programId], references: [id])
-  semester      Int
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id          String   @id @default(cuid())
+  name        String
+  code        String   @unique
+  description String?
+  coefficient Float    @default(1)
+  hours       Int?
+  programId   String
+  program     Program  @relation(fields: [programId], references: [id])
+  semester    Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  teachers      TeacherSubject[]
-  courses       Course[]
-  sessions      Session[]
-  absences      Absence[]
-  grades        Grade[]
-  exams         Exam[]
+  teachers TeacherSubject[]
+  courses  Course[]
+  sessions Session[]
+  absences Absence[]
+  grades   Grade[]
+  exams    Exam[]
 
   @@map("subjects")
 }
 
 model TeacherSubject {
-  id              String       @id @default(cuid())
-  subjectId       String
-  subject         Subject      @relation(fields: [subjectId], references: [id])
-  teacherId       String
-  teacher         Teacher      @relation(fields: [teacherId], references: [id])
-  courseType      CourseType   @default(COURSE)
-  
-  academicYearId  String
-  academicYear    AcademicYear @relation(fields: [academicYearId], references: [id])
+  id         String     @id @default(cuid())
+  subjectId  String
+  subject    Subject    @relation(fields: [subjectId], references: [id])
+  teacherId  String
+  teacher    Teacher    @relation(fields: [teacherId], references: [id])
+  courseType CourseType @default(COURSE)
+
+  academicYearId String
+  academicYear   AcademicYear @relation(fields: [academicYearId], references: [id])
 
   @@unique([subjectId, teacherId, courseType, academicYearId])
   @@map("teacher_subjects")
@@ -291,19 +292,19 @@ model TeacherSubject {
 // ============================================================
 
 model Course {
-  id           String     @id @default(cuid())
-  title        String
-  description  String?
-  content      String?
-  fileUrl      String?
-  type         CourseType @default(COURSE)
-  subjectId    String
-  subject      Subject    @relation(fields: [subjectId], references: [id])
-  teacherId    String
-  teacher      Teacher    @relation(fields: [teacherId], references: [id])
-  published    Boolean    @default(true)
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  id          String     @id @default(cuid())
+  title       String
+  description String?
+  content     String?
+  fileUrl     String?
+  type        CourseType @default(COURSE)
+  subjectId   String
+  subject     Subject    @relation(fields: [subjectId], references: [id])
+  teacherId   String
+  teacher     Teacher    @relation(fields: [teacherId], references: [id])
+  published   Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 
   @@map("courses")
 }
@@ -325,26 +326,26 @@ model Room {
 }
 
 model Session {
-  id           String     @id @default(cuid())
-  title        String?
-  type         SessionType @default(COURSE)
-  subjectId    String
-  subject      Subject    @relation(fields: [subjectId], references: [id])
-  teacherId    String
-  teacher      Teacher    @relation(fields: [teacherId], references: [id])
-  groupId      String
-  group        Group      @relation(fields: [groupId], references: [id])
-  roomId       String?
-  room         Room?      @relation(fields: [roomId], references: [id])
-  adminId      String     
-  admin        Admin      @relation(fields: [adminId], references: [id])
-  startDate    DateTime
-  endDate      DateTime
-  recurring    Boolean    @default(false)
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  id        String      @id @default(cuid())
+  title     String?
+  type      SessionType @default(COURSE)
+  subjectId String
+  subject   Subject     @relation(fields: [subjectId], references: [id])
+  teacherId String
+  teacher   Teacher     @relation(fields: [teacherId], references: [id])
+  groupId   String
+  group     Group       @relation(fields: [groupId], references: [id])
+  roomId    String?
+  room      Room?       @relation(fields: [roomId], references: [id])
+  adminId   String
+  admin     Admin       @relation(fields: [adminId], references: [id])
+  startDate DateTime
+  endDate   DateTime
+  recurring Boolean     @default(false)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
 
-  absences     Absence[]
+  absences Absence[]
 
   @@map("sessions")
 }
@@ -354,18 +355,18 @@ model Session {
 // ============================================================
 
 model Absence {
-  id            String         @id @default(cuid())
+  id            String        @id @default(cuid())
   studentId     String
-  student       Student        @relation(fields: [studentId], references: [id])
+  student       Student       @relation(fields: [studentId], references: [id])
   subjectId     String
-  subject       Subject        @relation(fields: [subjectId], references: [id])
+  subject       Subject       @relation(fields: [subjectId], references: [id])
   sessionId     String
-  session       Session        @relation(fields: [sessionId], references: [id])
-  status        AbsenceStatus  @default(ABSENT)
+  session       Session       @relation(fields: [sessionId], references: [id])
+  status        AbsenceStatus @default(ABSENT)
   justification String?
-  justified     Boolean        @default(false)
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  justified     Boolean       @default(false)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
 
   @@unique([studentId, sessionId])
   @@map("absences")
@@ -376,26 +377,26 @@ model Absence {
 // ============================================================
 
 model Grade {
-  id             String       @id @default(cuid())
+  id             String      @id @default(cuid())
   studentId      String
-  student        Student      @relation(fields: [studentId], references: [id])
+  student        Student     @relation(fields: [studentId], references: [id])
   subjectId      String
-  subject        Subject      @relation(fields: [subjectId], references: [id])
+  subject        Subject     @relation(fields: [subjectId], references: [id])
   teacherId      String
-  teacher        Teacher      @relation(fields: [teacherId], references: [id])
+  teacher        Teacher     @relation(fields: [teacherId], references: [id])
   examId         String?
-  exam           Exam?        @relation(fields: [examId], references: [id])
+  exam           Exam?       @relation(fields: [examId], references: [id])
   value          Float
   evaluationType String
-  status         GradeStatus  @default(PROVISIONAL)
+  status         GradeStatus @default(PROVISIONAL)
   comment        String?
-  
+
   academicYearId String
   academicYear   AcademicYear @relation(fields: [academicYearId], references: [id])
   semester       Int
-  
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("grades")
 }
@@ -405,32 +406,32 @@ model Grade {
 // ============================================================
 
 model Exam {
-  id             String       @id @default(cuid())
-  title          String
-  description    String?
-  subjectId      String
-  subject        Subject      @relation(fields: [subjectId], references: [id])
-  programId      String
-  program        Program      @relation(fields: [programId], references: [id])
-  adminId        String
-  admin          Admin        @relation(fields: [adminId], references: [id])
-  teacherId      String?
-  teacher        Teacher?     @relation(fields: [teacherId], references: [id])
-  roomId         String?
-  room           Room?        @relation(fields: [roomId], references: [id])
-  startDate      DateTime
-  endDate        DateTime
-  status         ExamStatus   @default(SCHEDULED)
-  semester       Int
-  
+  id          String     @id @default(cuid())
+  title       String
+  description String?
+  subjectId   String
+  subject     Subject    @relation(fields: [subjectId], references: [id])
+  programId   String
+  program     Program    @relation(fields: [programId], references: [id])
+  adminId     String
+  admin       Admin      @relation(fields: [adminId], references: [id])
+  teacherId   String?
+  teacher     Teacher?   @relation(fields: [teacherId], references: [id])
+  roomId      String?
+  room        Room?      @relation(fields: [roomId], references: [id])
+  startDate   DateTime
+  endDate     DateTime
+  status      ExamStatus @default(SCHEDULED)
+  semester    Int
+
   academicYearId String
   academicYear   AcademicYear @relation(fields: [academicYearId], references: [id])
-  
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
 
-  registrations  ExamRegistration[]
-  grades         Grade[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  registrations ExamRegistration[]
+  grades        Grade[]
 
   @@map("exams")
 }
@@ -452,21 +453,21 @@ model ExamRegistration {
 // ============================================================
 
 model News {
-  id            String      @id @default(cuid())
-  title         String
-  content       String
-  imageUrl      String?
-  adminId       String
-  admin         Admin       @relation(fields: [adminId], references: [id])
-  published     Boolean     @default(true)
-  
-  departmentId  String?
-  department    Department? @relation(fields: [departmentId], references: [id])
-  programId     String?
-  program       Program?    @relation(fields: [programId], references: [id])
+  id        String  @id @default(cuid())
+  title     String
+  content   String
+  imageUrl  String?
+  adminId   String
+  admin     Admin   @relation(fields: [adminId], references: [id])
+  published Boolean @default(true)
 
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id])
+  programId    String?
+  program      Program?    @relation(fields: [programId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("news")
 }
@@ -476,16 +477,16 @@ model News {
 // ============================================================
 
 model CalendarEvent {
-  id          String      @id @default(cuid())
+  id          String    @id @default(cuid())
   title       String
   description String?
-  type        EventType   @default(OTHER)
+  type        EventType @default(OTHER)
   startDate   DateTime
   endDate     DateTime
   adminId     String
-  admin       Admin       @relation(fields: [adminId], references: [id])
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  admin       Admin     @relation(fields: [adminId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   @@map("calendar_events")
 }
@@ -505,15 +506,15 @@ enum NotificationType {
 }
 
 model Notification {
-  id              String           @id @default(cuid())
-  title           String
-  message         String
-  type            NotificationType @default(INFO)
-  userId          String
-  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  read            Boolean          @default(false)
-  redirectLink    String?
-  createdAt       DateTime         @default(now())
+  id           String           @id @default(cuid())
+  title        String
+  message      String
+  type         NotificationType @default(INFO)
+  userId       String
+  user         User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  read         Boolean          @default(false)
+  redirectLink String?
+  createdAt    DateTime         @default(now())
 
   @@map("notifications")
 }
