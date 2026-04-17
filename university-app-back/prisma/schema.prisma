@@ -7,6 +7,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 // ============================================================
@@ -35,6 +36,7 @@ enum SessionType {
 enum AbsenceStatus {
   ABSENT
   PRESENT
+  EXCUSED
 }
 
 enum ExamStatus {
@@ -79,7 +81,6 @@ model User {
   admin      Admin?
 
   notifications Notification[]
-
   @@map("users")
 }
 
@@ -101,6 +102,26 @@ model Admin {
 }
 
 // ============================================================
+// ACADEMIC YEAR
+// ============================================================
+
+model AcademicYear {
+  id        String   @id @default(cuid())
+  label     String   @unique // ex: "2023-2024"
+  startDate DateTime
+  endDate   DateTime
+  active    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  students        Student[]
+  teacherSubjects TeacherSubject[]
+  grades          Grade[]
+  exams           Exam[]
+
+  @@map("academic_years")
+}
+
+// ============================================================
 // UNIVERSITY STRUCTURE
 // ============================================================
 
@@ -115,16 +136,17 @@ model Department {
   programs    Program[]
   teachers    Teacher[]
   students    Student[]
+  news        News[]
 
   @@map("departments")
 }
 
 model Program {
   id            String      @id @default(cuid())
-  name          String
+  name          String      // Filière, ex: "Ingénierie Informatique"
   code          String      @unique
   description   String?
-  level         String
+  level         String      
   departmentId  String
   department    Department  @relation(fields: [departmentId], references: [id])
   createdAt     DateTime    @default(now())
@@ -134,21 +156,37 @@ model Program {
   subjects      Subject[]
   students      Student[]
   exams         Exam[]
+  news          News[]
 
   @@map("programs")
 }
 
+model Level {
+  id         String  @id @default(cuid())
+  name       String 
+  order      Int
+
+  programId  String
+  program    Program @relation(fields: [programId], references: [id])
+
+  groups     Group[]
+
+  @@map("levels")
+}
+
 model Group {
-  id        String   @id @default(cuid())
+  id        String  @id @default(cuid())
   name      String
-  code      String   @unique
-  programId String
-  program   Program  @relation(fields: [programId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  code      String  @unique
+
+  levelId   String
+  level     Level   @relation(fields: [levelId], references: [id])
 
   students  Student[]
   sessions  Session[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("groups")
 }
@@ -168,7 +206,10 @@ model Student {
   program       Program     @relation(fields: [programId], references: [id])
   groupId       String
   group         Group       @relation(fields: [groupId], references: [id])
-  academicYear  String
+  
+  academicYearId String
+  academicYear   AcademicYear @relation(fields: [academicYearId], references: [id])
+  
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 
@@ -199,6 +240,7 @@ model Teacher {
   sessions      Session[]
   subjectLinks  TeacherSubject[]
   grades        Grade[]
+  exams         Exam[]
 
   @@map("teachers")
 }
@@ -231,15 +273,17 @@ model Subject {
 }
 
 model TeacherSubject {
-  id            String     @id @default(cuid())
-  subjectId     String
-  subject       Subject    @relation(fields: [subjectId], references: [id])
-  teacherId     String
-  teacher       Teacher    @relation(fields: [teacherId], references: [id])
-  courseType    CourseType @default(COURSE)
-  academicYear  String
+  id              String       @id @default(cuid())
+  subjectId       String
+  subject         Subject      @relation(fields: [subjectId], references: [id])
+  teacherId       String
+  teacher         Teacher      @relation(fields: [teacherId], references: [id])
+  courseType      CourseType   @default(COURSE)
+  
+  academicYearId  String
+  academicYear    AcademicYear @relation(fields: [academicYearId], references: [id])
 
-  @@unique([subjectId, teacherId, courseType, academicYear])
+  @@unique([subjectId, teacherId, courseType, academicYearId])
   @@map("teacher_subjects")
 }
 
@@ -293,7 +337,7 @@ model Session {
   group        Group      @relation(fields: [groupId], references: [id])
   roomId       String?
   room         Room?      @relation(fields: [roomId], references: [id])
-  adminId      String
+  adminId      String     
   admin        Admin      @relation(fields: [adminId], references: [id])
   startDate    DateTime
   endDate      DateTime
@@ -313,16 +357,16 @@ model Session {
 model Absence {
   id            String         @id @default(cuid())
   studentId     String
-  student       Student       @relation(fields: [studentId], references: [id])
+  student       Student        @relation(fields: [studentId], references: [id])
   subjectId     String
-  subject       Subject       @relation(fields: [subjectId], references: [id])
+  subject       Subject        @relation(fields: [subjectId], references: [id])
   sessionId     String
-  session       Session       @relation(fields: [sessionId], references: [id])
-  status        AbsenceStatus @default(ABSENT)
+  session       Session        @relation(fields: [sessionId], references: [id])
+  status        AbsenceStatus  @default(ABSENT)
   justification String?
-  justified     Boolean       @default(false)
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  justified     Boolean        @default(false)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
 
   @@unique([studentId, sessionId])
   @@map("absences")
@@ -333,23 +377,26 @@ model Absence {
 // ============================================================
 
 model Grade {
-  id            String      @id @default(cuid())
-  studentId     String
-  student       Student     @relation(fields: [studentId], references: [id])
-  subjectId     String
-  subject       Subject     @relation(fields: [subjectId], references: [id])
-  teacherId     String
-  teacher       Teacher     @relation(fields: [teacherId], references: [id])
-  examId        String?
-  exam          Exam?       @relation(fields: [examId], references: [id])
-  value         Float
+  id             String       @id @default(cuid())
+  studentId      String
+  student        Student      @relation(fields: [studentId], references: [id])
+  subjectId      String
+  subject        Subject      @relation(fields: [subjectId], references: [id])
+  teacherId      String
+  teacher        Teacher      @relation(fields: [teacherId], references: [id])
+  examId         String?
+  exam           Exam?        @relation(fields: [examId], references: [id])
+  value          Float
   evaluationType String
-  status        GradeStatus @default(PROVISIONAL)
-  comment       String?
-  academicYear  String
-  semester      Int
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  status         GradeStatus  @default(PROVISIONAL)
+  comment        String?
+  
+  academicYearId String
+  academicYear   AcademicYear @relation(fields: [academicYearId], references: [id])
+  semester       Int
+  
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
 
   @@map("grades")
 }
@@ -359,27 +406,32 @@ model Grade {
 // ============================================================
 
 model Exam {
-  id            String      @id @default(cuid())
-  title         String
-  description   String?
-  subjectId     String
-  subject       Subject     @relation(fields: [subjectId], references: [id])
-  programId     String
-  program       Program     @relation(fields: [programId], references: [id])
-  adminId       String
-  admin         Admin       @relation(fields: [adminId], references: [id])
-  roomId        String?
-  room          Room?       @relation(fields: [roomId], references: [id])
-  startDate     DateTime
-  endDate       DateTime
-  status        ExamStatus  @default(SCHEDULED)
-  semester      Int
-  academicYear  String
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  id             String       @id @default(cuid())
+  title          String
+  description    String?
+  subjectId      String
+  subject        Subject      @relation(fields: [subjectId], references: [id])
+  programId      String
+  program        Program      @relation(fields: [programId], references: [id])
+  adminId        String
+  admin          Admin        @relation(fields: [adminId], references: [id])
+  teacherId      String?
+  teacher        Teacher?     @relation(fields: [teacherId], references: [id])
+  roomId         String?
+  room           Room?        @relation(fields: [roomId], references: [id])
+  startDate      DateTime
+  endDate        DateTime
+  status         ExamStatus   @default(SCHEDULED)
+  semester       Int
+  
+  academicYearId String
+  academicYear   AcademicYear @relation(fields: [academicYearId], references: [id])
+  
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
 
-  registrations ExamRegistration[]
-  grades        Grade[]
+  registrations  ExamRegistration[]
+  grades         Grade[]
 
   @@map("exams")
 }
@@ -401,17 +453,21 @@ model ExamRegistration {
 // ============================================================
 
 model News {
-  id            String   @id @default(cuid())
+  id            String      @id @default(cuid())
   title         String
   content       String
   imageUrl      String?
   adminId       String
-  admin         Admin   @relation(fields: [adminId], references: [id])
-  published     Boolean @default(true)
+  admin         Admin       @relation(fields: [adminId], references: [id])
+  published     Boolean     @default(true)
+  
   departmentId  String?
+  department    Department? @relation(fields: [departmentId], references: [id])
   programId     String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  program       Program?    @relation(fields: [programId], references: [id])
+
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
 
   @@map("news")
 }
@@ -433,21 +489,6 @@ model CalendarEvent {
   updatedAt   DateTime    @updatedAt
 
   @@map("calendar_events")
-}
-
-// ============================================================
-// ACADEMIC YEAR
-// ============================================================
-
-model AcademicYear {
-  id        String   @id @default(cuid())
-  label     String   @unique
-  startDate DateTime
-  endDate   DateTime
-  active    Boolean  @default(false)
-  createdAt DateTime @default(now())
-
-  @@map("academic_years")
 }
 
 // ============================================================
