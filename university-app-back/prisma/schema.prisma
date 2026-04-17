@@ -1,16 +1,12 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 // ============================================================
@@ -19,72 +15,72 @@ datasource db {
 
 enum Role {
   ADMIN
-  ETUDIANT
-  ENSEIGNANT
+  STUDENT
+  TEACHER
 }
 
-enum TypeCours {
-  COURS
+enum CourseType {
+  COURSE
   TD
   TP
 }
 
-enum TypeSeance {
-  COURS
+enum SessionType {
+  COURSE
   TD
   TP
-  EXAMEN
+  EXAM
 }
 
-enum StatutAbsence {
+enum AbsenceStatus {
   ABSENT
   PRESENT
-  RETARD
-  JUSTIFIE
 }
 
-enum StatutExamen {
-  PLANIFIE
-  EN_COURS
-  TERMINE
-  ANNULE
+enum ExamStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELED
 }
 
-enum TypeEvenement {
-  RENTREE
-  CONGE
-  EXAMEN
-  RATTRAPAGE
-  AUTRE
+enum EventType {
+  START_OF_YEAR
+  HOLIDAY
+  EXAM
+  MAKEUP
+  OTHER
 }
 
-enum StatutNote {
-  PROVISOIRE
-  DEFINITIVE
+enum GradeStatus {
+  PROVISIONAL
+  FINAL
 }
 
 // ============================================================
-// AUTHENTIFICATION & UTILISATEURS
+// AUTHENTICATION & USERS
 // ============================================================
 
-model Utilisateur {
+model User {
   id         String   @id @default(cuid())
   email      String   @unique
-  motDePasse String
+  password   String
   role       Role
-  nom        String
-  prenom     String
-  telephone  String?
+  firstName  String
+  lastName   String
+  phone      String?
   photo      String?
-  actif      Boolean  @default(true)
+  active     Boolean  @default(true)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  etudiant   Etudiant?
-  enseignant Enseignant?
+  student    Student?
+  teacher    Teacher?
   admin      Admin?
 
-  @@map("utilisateurs")
+  notifications Notification[]
+
+  @@map("users")
 }
 
 // ============================================================
@@ -93,387 +89,390 @@ model Utilisateur {
 
 model Admin {
   id            String      @id @default(cuid())
-  utilisateurId String      @unique
-  utilisateur   Utilisateur @relation(fields: [utilisateurId], references: [id], onDelete: Cascade)
+  userId        String      @unique
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  actualites           Actualite[]
-  examens              Examen[]
-  seances              Seance[]
-  evenementsCalendrier EvenementCalendrier[]
+  news          News[]
+  exams         Exam[]
+  sessions      Session[]
+  calendarEvents CalendarEvent[]
 
   @@map("admins")
 }
 
 // ============================================================
-// STRUCTURE UNIVERSITAIRE
+// UNIVERSITY STRUCTURE
 // ============================================================
 
-model Departement {
+model Department {
   id          String   @id @default(cuid())
-  nom         String   @unique
+  name        String   @unique
   code        String   @unique
   description String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  filieres    Filiere[]
-  enseignants Enseignant[]
-  etudiants   Etudiant[]
+  programs    Program[]
+  teachers    Teacher[]
+  students    Student[]
 
-  @@map("departements")
+  @@map("departments")
 }
 
-model Filiere {
+model Program {
   id            String      @id @default(cuid())
-  nom           String
+  name          String
   code          String      @unique
   description   String?
-  niveau        String      // Licence, Master, Doctorat...
-  departementId String
-  departement   Departement @relation(fields: [departementId], references: [id])
+  level         String
+  departmentId  String
+  department    Department  @relation(fields: [departmentId], references: [id])
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 
-  groupes   Groupe[]
-  matieres  Matiere[]
-  etudiants Etudiant[]
-  examens   Examen[]
+  groups        Group[]
+  subjects      Subject[]
+  students      Student[]
+  exams         Exam[]
 
-  @@map("filieres")
+  @@map("programs")
 }
 
-model Groupe {
+model Group {
   id        String   @id @default(cuid())
-  nom       String
+  name      String
   code      String   @unique
-  filiereId String
-  filiere   Filiere  @relation(fields: [filiereId], references: [id])
+  programId String
+  program   Program  @relation(fields: [programId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  etudiants Etudiant[]
-  seances   Seance[]
+  students  Student[]
+  sessions  Session[]
 
-  @@map("groupes")
+  @@map("groups")
 }
 
 // ============================================================
-// ETUDIANT
+// STUDENT
 // ============================================================
 
-model Etudiant {
+model Student {
   id            String      @id @default(cuid())
   matricule     String      @unique
-  utilisateurId String      @unique
-  utilisateur   Utilisateur @relation(fields: [utilisateurId], references: [id], onDelete: Cascade)
-  departementId String
-  departement   Departement @relation(fields: [departementId], references: [id])
-  filiereId     String
-  filiere       Filiere     @relation(fields: [filiereId], references: [id])
-  groupeId      String
-  groupe        Groupe      @relation(fields: [groupeId], references: [id])
-  anneeScolaire String
+  userId        String      @unique
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  departmentId  String
+  department    Department  @relation(fields: [departmentId], references: [id])
+  programId     String
+  program       Program     @relation(fields: [programId], references: [id])
+  groupId       String
+  group         Group       @relation(fields: [groupId], references: [id])
+  academicYear  String
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 
-  absences           Absence[]
-  notes              Note[]
-  inscriptionsExamen InscriptionExamen[]
+  absences      Absence[]
+  grades        Grade[]
+  examRegs      ExamRegistration[]
 
-  @@map("etudiants")
+  @@map("students")
 }
 
 // ============================================================
-// ENSEIGNANT
+// TEACHER
 // ============================================================
 
-model Enseignant {
+model Teacher {
   id            String      @id @default(cuid())
   matricule     String      @unique
-  utilisateurId String      @unique
-  utilisateur   Utilisateur @relation(fields: [utilisateurId], references: [id], onDelete: Cascade)
-  departementId String
-  departement   Departement @relation(fields: [departementId], references: [id])
+  userId        String      @unique
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  departmentId  String
+  department    Department  @relation(fields: [departmentId], references: [id])
   grade         String?
-  specialite    String?
+  specialty     String?
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 
-  cours              Cours[]
-  seances            Seance[]
-  matiereEnseignees  MatiereEnseignant[]
-  notes              Note[]
+  courses       Course[]
+  sessions      Session[]
+  subjectLinks  TeacherSubject[]
+  grades        Grade[]
 
-  @@map("enseignants")
+  @@map("teachers")
 }
 
 // ============================================================
-// MATIERES
+// SUBJECTS
 // ============================================================
 
-model Matiere {
+model Subject {
   id            String   @id @default(cuid())
-  nom           String
+  name          String
   code          String   @unique
   description   String?
   coefficient   Float    @default(1)
-  volumeHoraire Int?
-  filiereId     String
-  filiere       Filiere  @relation(fields: [filiereId], references: [id])
-  semestre      Int
+  hours         Int?
+  programId     String
+  program       Program  @relation(fields: [programId], references: [id])
+  semester      Int
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  enseignants MatiereEnseignant[]
-  cours       Cours[]
-  seances     Seance[]
-  absences    Absence[]
-  notes       Note[]
-  examens     Examen[]
+  teachers      TeacherSubject[]
+  courses       Course[]
+  sessions      Session[]
+  absences      Absence[]
+  grades        Grade[]
+  exams         Exam[]
 
-  @@map("matieres")
+  @@map("subjects")
 }
 
-model MatiereEnseignant {
+model TeacherSubject {
   id            String     @id @default(cuid())
-  matiereId     String
-  matiere       Matiere    @relation(fields: [matiereId], references: [id])
-  enseignantId  String
-  enseignant    Enseignant @relation(fields: [enseignantId], references: [id])
-  typeCours     TypeCours  @default(COURS)
-  anneeScolaire String
+  subjectId     String
+  subject       Subject    @relation(fields: [subjectId], references: [id])
+  teacherId     String
+  teacher       Teacher    @relation(fields: [teacherId], references: [id])
+  courseType    CourseType @default(COURSE)
+  academicYear  String
 
-  @@unique([matiereId, enseignantId, typeCours, anneeScolaire])
-  @@map("matieres_enseignants")
+  @@unique([subjectId, teacherId, courseType, academicYear])
+  @@map("teacher_subjects")
 }
 
 // ============================================================
-// COURS (ressources publiées par l'enseignant)
+// COURSES
 // ============================================================
 
-model Cours {
+model Course {
   id           String     @id @default(cuid())
-  titre        String
+  title        String
   description  String?
-  contenu      String?
-  fichierUrl   String?
-  type         TypeCours  @default(COURS)
-  matiereId    String
-  matiere      Matiere    @relation(fields: [matiereId], references: [id])
-  enseignantId String
-  enseignant   Enseignant @relation(fields: [enseignantId], references: [id])
-  publie       Boolean    @default(true)
+  content      String?
+  fileUrl      String?
+  type         CourseType @default(COURSE)
+  subjectId    String
+  subject      Subject    @relation(fields: [subjectId], references: [id])
+  teacherId    String
+  teacher      Teacher    @relation(fields: [teacherId], references: [id])
+  published    Boolean    @default(true)
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 
-  @@map("cours")
+  @@map("courses")
 }
 
 // ============================================================
-// EMPLOI DU TEMPS — SEANCES
+// SCHEDULE
 // ============================================================
 
-model Salle {
+model Room {
   id       String  @id @default(cuid())
-  nom      String  @unique
-  capacite Int?
-  batiment String?
+  name     String  @unique
+  capacity Int?
+  building String?
 
-  seances Seance[]
-  examens Examen[]
+  sessions Session[]
+  exams    Exam[]
 
-  @@map("salles")
+  @@map("rooms")
 }
 
-model Seance {
+model Session {
   id           String     @id @default(cuid())
-  titre        String?
-  type         TypeSeance @default(COURS)
-  matiereId    String
-  matiere      Matiere    @relation(fields: [matiereId], references: [id])
-  enseignantId String
-  enseignant   Enseignant @relation(fields: [enseignantId], references: [id])
-  groupeId     String
-  groupe       Groupe     @relation(fields: [groupeId], references: [id])
-  salleId      String?
-  salle        Salle?     @relation(fields: [salleId], references: [id])
+  title        String?
+  type         SessionType @default(COURSE)
+  subjectId    String
+  subject      Subject    @relation(fields: [subjectId], references: [id])
+  teacherId    String
+  teacher      Teacher    @relation(fields: [teacherId], references: [id])
+  groupId      String
+  group        Group      @relation(fields: [groupId], references: [id])
+  roomId       String?
+  room         Room?      @relation(fields: [roomId], references: [id])
   adminId      String
   admin        Admin      @relation(fields: [adminId], references: [id])
-  dateDebut    DateTime
-  dateFin      DateTime
-  recurrente   Boolean    @default(false)
+  startDate    DateTime
+  endDate      DateTime
+  recurring    Boolean    @default(false)
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 
-  absences Absence[]
+  absences     Absence[]
 
-  @@map("seances")
+  @@map("sessions")
 }
 
 // ============================================================
-// ABSENCES & PRESENCES
+// ABSENCES
 // ============================================================
 
 model Absence {
-  id            String        @id @default(cuid())
-  etudiantId    String
-  etudiant      Etudiant      @relation(fields: [etudiantId], references: [id])
-  matiereId     String
-  matiere       Matiere       @relation(fields: [matiereId], references: [id])
-  seanceId      String
-  seance        Seance        @relation(fields: [seanceId], references: [id])
-  statut        StatutAbsence @default(ABSENT)
+  id            String         @id @default(cuid())
+  studentId     String
+  student       Student       @relation(fields: [studentId], references: [id])
+  subjectId     String
+  subject       Subject       @relation(fields: [subjectId], references: [id])
+  sessionId     String
+  session       Session       @relation(fields: [sessionId], references: [id])
+  status        AbsenceStatus @default(ABSENT)
   justification String?
-  justifiee     Boolean       @default(false)
+  justified     Boolean       @default(false)
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 
-  @@unique([etudiantId, seanceId])
+  @@unique([studentId, sessionId])
   @@map("absences")
 }
 
 // ============================================================
-// NOTES
+// GRADES
 // ============================================================
 
-model Note {
-  id             String     @id @default(cuid())
-  etudiantId     String
-  etudiant       Etudiant   @relation(fields: [etudiantId], references: [id])
-  matiereId      String
-  matiere        Matiere    @relation(fields: [matiereId], references: [id])
-  enseignantId   String
-  enseignant     Enseignant @relation(fields: [enseignantId], references: [id])
-  examenId       String?
-  examen         Examen?    @relation(fields: [examenId], references: [id])
-  valeur         Float
-  typeEvaluation String     // "Contrôle", "Examen Final", "TP", "Partiel"
-  statut         StatutNote @default(PROVISOIRE)
-  commentaire    String?
-  anneeScolaire  String
-  semestre       Int
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
+model Grade {
+  id            String      @id @default(cuid())
+  studentId     String
+  student       Student     @relation(fields: [studentId], references: [id])
+  subjectId     String
+  subject       Subject     @relation(fields: [subjectId], references: [id])
+  teacherId     String
+  teacher       Teacher     @relation(fields: [teacherId], references: [id])
+  examId        String?
+  exam          Exam?       @relation(fields: [examId], references: [id])
+  value         Float
+  evaluationType String
+  status        GradeStatus @default(PROVISIONAL)
+  comment       String?
+  academicYear  String
+  semester      Int
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
 
-  @@map("notes")
+  @@map("grades")
 }
 
 // ============================================================
-// EXAMENS
+// EXAMS
 // ============================================================
 
-model Examen {
-  id            String       @id @default(cuid())
-  titre         String
+model Exam {
+  id            String      @id @default(cuid())
+  title         String
   description   String?
-  matiereId     String
-  matiere       Matiere      @relation(fields: [matiereId], references: [id])
-  filiereId     String
-  filiere       Filiere      @relation(fields: [filiereId], references: [id])
+  subjectId     String
+  subject       Subject     @relation(fields: [subjectId], references: [id])
+  programId     String
+  program       Program     @relation(fields: [programId], references: [id])
   adminId       String
-  admin         Admin        @relation(fields: [adminId], references: [id])
-  salleId       String?
-  salle         Salle?       @relation(fields: [salleId], references: [id])
-  dateDebut     DateTime
-  dateFin       DateTime
-  statut        StatutExamen @default(PLANIFIE)
-  semestre      Int
-  anneeScolaire String
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
+  admin         Admin       @relation(fields: [adminId], references: [id])
+  roomId        String?
+  room          Room?       @relation(fields: [roomId], references: [id])
+  startDate     DateTime
+  endDate       DateTime
+  status        ExamStatus  @default(SCHEDULED)
+  semester      Int
+  academicYear  String
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
 
-  inscriptions InscriptionExamen[]
-  notes        Note[]
+  registrations ExamRegistration[]
+  grades        Grade[]
 
-  @@map("examens")
+  @@map("exams")
 }
 
-model InscriptionExamen {
-  id         String   @id @default(cuid())
-  etudiantId String
-  etudiant   Etudiant @relation(fields: [etudiantId], references: [id])
-  examenId   String
-  examen     Examen   @relation(fields: [examenId], references: [id])
-  createdAt  DateTime @default(now())
+model ExamRegistration {
+  id        String   @id @default(cuid())
+  studentId String
+  student   Student  @relation(fields: [studentId], references: [id])
+  examId    String
+  exam      Exam     @relation(fields: [examId], references: [id])
+  createdAt DateTime @default(now())
 
-  @@unique([etudiantId, examenId])
-  @@map("inscriptions_examens")
+  @@unique([studentId, examId])
+  @@map("exam_registrations")
 }
 
 // ============================================================
-// ACTUALITES
+// NEWS
 // ============================================================
 
-model Actualite {
-  id            String    @id @default(cuid())
-  titre         String
-  contenu       String
+model News {
+  id            String   @id @default(cuid())
+  title         String
+  content       String
   imageUrl      String?
   adminId       String
-  admin         Admin     @relation(fields: [adminId], references: [id])
-  publiee       Boolean   @default(true)
-  departementId String?   // null = visible par tous
-  filiereId     String?   // null = visible par tous
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  admin         Admin   @relation(fields: [adminId], references: [id])
+  published     Boolean @default(true)
+  departmentId  String?
+  programId     String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  @@map("actualites")
+  @@map("news")
 }
 
 // ============================================================
-// CALENDRIER UNIVERSITAIRE
+// CALENDAR
 // ============================================================
 
-model EvenementCalendrier {
-  id          String        @id @default(cuid())
-  titre       String
+model CalendarEvent {
+  id          String      @id @default(cuid())
+  title       String
   description String?
-  type        TypeEvenement @default(AUTRE)
-  dateDebut   DateTime
-  dateFin     DateTime
+  type        EventType   @default(OTHER)
+  startDate   DateTime
+  endDate     DateTime
   adminId     String
-  admin       Admin         @relation(fields: [adminId], references: [id])
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  admin       Admin       @relation(fields: [adminId], references: [id])
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
 
-  @@map("evenements_calendrier")
+  @@map("calendar_events")
 }
 
 // ============================================================
-// ANNEE SCOLAIRE
+// ACADEMIC YEAR
 // ============================================================
 
-model AnneeScolaire {
+model AcademicYear {
   id        String   @id @default(cuid())
-  libelle   String   @unique // "2024-2025"
-  dateDebut DateTime
-  dateFin   DateTime
+  label     String   @unique
+  startDate DateTime
+  endDate   DateTime
   active    Boolean  @default(false)
   createdAt DateTime @default(now())
 
-  @@map("annees_scolaires")
+  @@map("academic_years")
 }
 
+// ============================================================
+// NOTIFICATIONS
+// ============================================================
 
-enum TypeNotification {
+enum NotificationType {
   INFO
-  ALERTE
-  RAPPEL
-  NOTE
+  ALERT
+  REMINDER
+  GRADE
   ABSENCE
-  COURS
-  EXAMEN
+  COURSE
+  EXAM
 }
 
 model Notification {
   id              String           @id @default(cuid())
-  titre           String
+  title           String
   message         String
-  type            TypeNotification @default(INFO)
-  utilisateurId   String
-  utilisateur     Utilisateur      @relation(fields: [utilisateurId], references: [id], onDelete: Cascade)
-  lue             Boolean          @default(false)
-  lienRedirection String?          // ex: "/cours/123"
+  type            NotificationType @default(INFO)
+  userId          String
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  read            Boolean          @default(false)
+  redirectLink    String?
   createdAt       DateTime         @default(now())
 
   @@map("notifications")
