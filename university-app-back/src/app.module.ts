@@ -11,6 +11,7 @@ import { DepartmentModule } from './modules/department/department.module';
 import { SubjectModule } from './modules/subject/subject.module';
 import { ProgramModule } from './modules/program/program.module';
 import { CourseModule } from './modules/course/course.module';
+import { StudentModule } from './modules/student/student.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { CourseModule } from './modules/course/course.module';
     SubjectModule,
     ProgramModule,
     CourseModule,
+    StudentModule,
   ],
   controllers: [AppController],
   providers: [AppService],
