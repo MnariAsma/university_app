@@ -15,6 +15,8 @@ import { CourseService } from './course.service';
 import { createCourseDto } from './dto/createCourse.dto';
 import { UpdateCourseDto } from './dto/updateCourse.dto';
 import { ApiTags, ApiConsumes, ApiBody } from '@nestjs/swagger';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { Role } from '@prisma/client';
 
 @ApiTags('courses')
 @Controller('courses')
@@ -31,22 +33,24 @@ export class CourseController {
   //   return this.courseService.create(dto, file, req.user.id);
   // }
 
-  @Post()
-  @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FileInterceptor('file'))
-  create(
-    @UploadedFile() file: Express.Multer.File,
-    @Body() dto: createCourseDto,
-  ) {
-    console.log(file);
-    return this.courseService.create(dto, file, dto.teacherId);
-  }
+@Post()
+@UseInterceptors(FileInterceptor('file'))
+@Roles(Role.ADMIN, Role.TEACHER)
+async create(
+  @UploadedFile() file: Express.Multer.File,
+  @Body() dto: createCourseDto,
+  @Req() req,
+) {
+  return this.courseService.create(dto, file, req.user.id);
+}
 
+  @Roles(Role.ADMIN, Role.TEACHER)
   @Get('teacher')
   findMyCourses(@Req() req) {
     return this.courseService.findAllByTeacher(req.user.id);
   }
 
+  @Roles(Role.ADMIN, Role.STUDENT)
   @Get('student')
   findForStudent(@Req() req) {
     return this.courseService.findForStudent(
@@ -55,6 +59,7 @@ export class CourseController {
     );
   }
 
+  @Roles(Role.ADMIN, Role.TEACHER)
   @Put(':id')
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('file'))
@@ -67,6 +72,7 @@ export class CourseController {
     return this.courseService.update(id, dto, file, req.user.id);
   }
 
+  @Roles(Role.ADMIN, Role.TEACHER)
   @Delete(':id')
   remove(@Param('id') id: string, @Req() req) {
     return this.courseService.delete(id, req.user.id);

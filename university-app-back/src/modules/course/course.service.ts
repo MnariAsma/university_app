@@ -7,21 +7,34 @@ import { UpdateCourseDto } from './dto/updateCourse.dto';
 export class CourseService {
   constructor(private prisma: PrismaService) {}
 
-  async create(dto: createCourseDto, file: Express.Multer.File | undefined, teacherId: string) {
-    return this.prisma.course.create({
-      data: {
-        title: dto.title,
-        description: dto.description,
-        content: dto.content,
-        subjectId: dto.subjectId,
-        teacherId: teacherId,
-        fileUrl: file ? file.filename : null,
-        type: dto.type,
-      },
-    });
+async create(
+  dto: createCourseDto,
+  file: Express.Multer.File | undefined,
+  userId: string,
+) {
+  const teacher = await this.prisma.teacher.findFirst({
+    where: {
+      userId: userId,
+    },
+  });
+
+  if (!teacher) {
+    throw new Error("Teacher not found for this user");
   }
 
-  // ✅ GET ALL (prof)
+  return this.prisma.course.create({
+    data: {
+      title: dto.title,
+      description: dto.description,
+      content: dto.content,
+      subjectId: dto.subjectId,
+      teacherId: teacher.id,
+      fileUrl: file ? file.filename : null,
+      type: dto.type,
+    },
+  });
+}
+
   async findAllByTeacher(teacherId: string) {
     return this.prisma.course.findMany({
       where: { teacherId },
@@ -29,7 +42,7 @@ export class CourseService {
     });
   }
 
-  // ✅ GET STUDENT COURSES
+
   async findForStudent(programId: string, semester: number) {
     return this.prisma.course.findMany({
       where: {

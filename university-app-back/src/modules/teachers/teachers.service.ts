@@ -9,7 +9,7 @@ export class TeacherService {
   constructor(
     private prisma: PrismaService,
     private userService: UserService,
-  ) {}
+  ) { }
 
   async create(dto: CreateTeacherDto) {
     const user = await this.userService.createUser({

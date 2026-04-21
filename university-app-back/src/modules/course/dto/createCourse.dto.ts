@@ -8,6 +8,11 @@ export class createCourseDto {
   @IsNotEmpty()
   title: string;
 
+  @ApiProperty({ example: 'cuid-teacher-id', required: false })
+  @IsOptional()
+  @IsString()
+  teacherId?: string;
+
   @ApiProperty({ example: 'Mathematics' })
   @IsOptional()
   @IsString()
@@ -16,11 +21,6 @@ export class createCourseDto {
   @ApiProperty({ example: 'Mathematics' })
   @IsString()
   subjectId: string;
-
-  @ApiProperty({ example: 'cuid-teacher-id' })
-  @IsNotEmpty()
-  @IsString()
-  teacherId: string;
 
   @ApiProperty({ example: 'Mathematics' })
   @IsOptional()
