@@ -8,11 +8,6 @@ export class createCourseDto {
   @IsNotEmpty()
   title: string;
 
-  @ApiProperty({ example: 'cuid-teacher-id', required: false })
-  @IsOptional()
-  @IsString()
-  teacherId?: string;
-
   @ApiProperty({ example: 'Mathematics' })
   @IsOptional()
   @IsString()
