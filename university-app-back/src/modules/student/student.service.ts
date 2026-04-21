@@ -1,10 +1,72 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { PrismaService } from 'src/common/prisma.service';
+import { CreateStudentDto } from './dto/createStudent.dto';
 import { UpdateStudentDto } from './dto/updateStudent.dto';
+import * as bcrypt from 'bcrypt';
+import { Role } from '@prisma/client';
 
 @Injectable()
 export class StudentService {
   constructor(private prisma: PrismaService) {}
+
+  private generatePassword(length = 10): string {
+    const chars =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$!';
+    return Array.from({ length }, () =>
+      chars.charAt(Math.floor(Math.random() * chars.length)),
+    ).join('');
+  }
+
+  async create(dto: CreateStudentDto) {
+    const existing = await this.prisma.user.findUnique({ where: { email: dto.email } });
+    if (existing) throw new ConflictException('Email already in use');
+
+    const plainPassword = this.generatePassword();
+    const hashedPassword = await bcrypt.hash(plainPassword, 10);
+
+    const lastStudent = await this.prisma.student.findFirst({
+      orderBy: { createdAt: 'desc' },
+      select: { matricule: true },
+    });
+
+    let nextNumber = 1;
+    if (lastStudent?.matricule) {
+      const parts = lastStudent.matricule.split('-');
+      const numberPart = parseInt(parts[1]);
+      if (!isNaN(numberPart)) nextNumber = numberPart + 1;
+    }
+    const matricule = `STD-${nextNumber.toString().padStart(6, '0')}`;
+
+    await this.prisma.$transaction(async (tx) => {
+      const user = await tx.user.create({
+        data: {
+          email: dto.email,
+          password: hashedPassword,
+          role: Role.STUDENT,
+          firstName: dto.firstName,
+          lastName: dto.lastName,
+          phone: dto.phone,
+          active: true,
+        },
+      });
+
+      await tx.student.create({
+        data: {
+          userId: user.id,
+          matricule,
+          departmentId: dto.departmentId,
+          programId: dto.programId,
+          groupId: dto.groupId,
+          academicYearId: dto.academicYearId,
+        },
+      });
+    });
+
+    // TODO: replace with real email service once mail is configured
+    console.log(`✉️  Student credentials → Email: ${dto.email} | Password: ${plainPassword}`);
+
+    return { message: 'Student created successfully. Credentials sent to their email.' };
+  }
 
   async findAll() {
     return this.prisma.student.findMany({
