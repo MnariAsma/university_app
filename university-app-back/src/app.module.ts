@@ -12,6 +12,7 @@ import { SubjectModule } from './modules/subject/subject.module';
 import { ProgramModule } from './modules/program/program.module';
 import { CourseModule } from './modules/course/course.module';
 import { StudentModule } from './modules/student/student.module';
+import { MailModule } from 'src/modules/mail/mail.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { StudentModule } from './modules/student/student.module';
     ProgramModule,
     CourseModule,
     StudentModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [AppService],

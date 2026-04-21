@@ -4,10 +4,11 @@ import { CreateStudentDto } from './dto/createStudent.dto';
 import { UpdateStudentDto } from './dto/updateStudent.dto';
 import * as bcrypt from 'bcrypt';
 import { Role } from '@prisma/client';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class StudentService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private mailService: MailService) {}
 
   private generatePassword(length = 10): string {
     const chars =
@@ -63,7 +64,8 @@ export class StudentService {
     });
 
     // TODO: replace with real email service once mail is configured
-    console.log(`✉️  Student credentials → Email: ${dto.email} | Password: ${plainPassword}`);
+    await this.mailService.sendCredentials(dto.email, dto.firstName, plainPassword, 'STUDENT');
+
 
     return { message: 'Student created successfully. Credentials sent to their email.' };
   }
