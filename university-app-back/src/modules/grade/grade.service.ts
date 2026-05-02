@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/common/prisma.service';
-import { CreateGradesDto } from './create-grades.dto';
+import { CreateGradesDto } from './dto/create-grades.dto';
+import { TeacherSubject, Program, Level, Subject } from '@prisma/client';
 
 @Injectable()
 export class GradeService {
@@ -12,7 +13,7 @@ export class GradeService {
     return this.prisma.teacherSubject.findMany({
       where: { teacherId: teacher.id },
       include: { subject: true },
-    });
+    }) as Promise<(TeacherSubject & { subject: Subject })[]>;
   }
 
   async findPrograms(userId: string, subjectId?: string) {
@@ -24,9 +25,9 @@ export class GradeService {
       const links = await this.prisma.teacherSubject.findMany({
         where: { teacherId: teacher.id, subjectId },
         include: { program: true, subject: { include: { program: true } } },
-      });
+      }) as Array<TeacherSubject & { program?: Program | null; subject?: Subject & { program?: Program | null } } >;
 
-      const programsMap = new Map<string, any>();
+      const programsMap = new Map<string, Program>();
       for (const l of links) {
         if (l.program) programsMap.set(l.program.id, l.program);
         else if (l.subject?.program)
@@ -48,17 +49,19 @@ export class GradeService {
       if (!teacher) return [];
 
       const links = await this.prisma.teacherSubject.findMany({
-        where: { teacherId: teacher.id, subjectId, programId },
-        include: { level: true },
+        where: { teacherId: teacher.id, subjectId },
       });
 
-      const levelsMap = new Map<string, any>();
-      for (const l of links) {
-        if (l.level) levelsMap.set(l.level.id, l.level);
-      }
+      // Collect unique levelIds from links (force type for levelId)
+      const levelIds = Array.from(new Set((links as Array<{ levelId?: string }> ).map(l => l.levelId).filter(Boolean)));
+      if (levelIds.length === 0) return [];
 
-      // Fallback: if no explicit teacherSubject-level links, try deriving from groups/sessions if needed (omitted for brevity)
-      return Array.from(levelsMap.values());
+      // Fetch levels by ids
+      const levels = await this.prisma.level.findMany({
+        where: { id: { in: levelIds as string[] } },
+      });
+
+      return levels;
     }
 
     return this.prisma.level.findMany({ where: { programId } });
@@ -92,7 +95,7 @@ async upsertGrades(dto: CreateGradesDto, userId: string) {
     academicYearId = activeYear.id;
   }
 
-  const results = [] as any[];
+  const results: any[] = [];
 
   for (const g of dto.grades) {
     const existing = await this.prisma.grade.findFirst({
@@ -142,9 +145,9 @@ async upsertGrades(dto: CreateGradesDto, userId: string) {
     const links = await this.prisma.teacherSubject.findMany({
       where: { teacherId: teacher.id, subjectId },
       include: { program: true, level: true, subject: { include: { program: true } } },
-    });
+    }) as Array<TeacherSubject & { program?: Program | null; level?: Level | null; subject?: Subject & { program?: Program | null } }>;
 
-    const combosMap = new Map<string, any>();
+    const combosMap = new Map<string, { program: Program; level: Level | null }>();
     for (const l of links) {
       const program = l.program ?? l.subject?.program;
       const level = l.level ?? null;

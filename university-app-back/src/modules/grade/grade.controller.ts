@@ -3,7 +3,7 @@ import { GradeService } from './grade.service';
 import { ApiTags } from '@nestjs/swagger';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from '@prisma/client';
-import { CreateGradesDto } from './create-grades.dto';
+import { CreateGradesDto } from './dto/create-grades.dto';
 
 @ApiTags('grades')
 @Controller('grades')
