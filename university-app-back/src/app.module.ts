@@ -11,6 +11,7 @@ import { AdminModule } from './modules/admin/admin.module';
 import { DepartmentModule } from './modules/department/department.module';
 import { SubjectModule } from './modules/subject/subject.module';
 import { ProgramModule } from './modules/program/program.module';
+import { GradeModule } from './modules/grade/grade.module';
 
 import { LevelModule } from './modules/level/level.module';
 import { GroupModule } from './modules/group/group.module';
@@ -35,6 +36,7 @@ import { RolesGuard } from './common/guards/roles.guard';
     DepartmentModule,
     SubjectModule,
     ProgramModule,
+    GradeModule,
 
     // HEAD
     LevelModule,
@@ -47,12 +49,13 @@ import { RolesGuard } from './common/guards/roles.guard';
     MailModule,
   ],
   controllers: [AppController],
-  providers: [AppService,    { provide: APP_GUARD, 
-      useClass: JwtAuthGuard
-    },
+  providers: [
+    AppService,
+    { provide: APP_GUARD, useClass: JwtAuthGuard },
     {
       provide: APP_GUARD,
       useClass: RolesGuard,
-    },],
+    },
+  ],
 })
 export class AppModule {}

@@ -1,111 +1,169 @@
 import { PrismaPg } from '@prisma/adapter-pg';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Role, CourseType } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
-import * as dotenv from 'dotenv';
 
-dotenv.config();
-
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
-const prisma = new PrismaClient({ adapter } as any);
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! })
+const prisma = new PrismaClient({ adapter })
 
 async function main() {
-  console.log('🌱 Seeding database...');
+  const password = await bcrypt.hash('123456', 10);
 
-  // ─── Academic Year ───────────────────────────────────────
+  // =====================================================
+  // Academic Year
+  // =====================================================
   const academicYear = await prisma.academicYear.upsert({
-    where: { label: '2024-2025' },
+    where: { label: '2025-2026' },
     update: {},
     create: {
-      label: '2024-2025',
-      startDate: new Date('2024-09-01'),
-      endDate: new Date('2025-06-30'),
+      label: '2025-2026',
+      startDate: new Date('2025-09-01'),
+      endDate: new Date('2026-06-30'),
       active: true,
     },
   });
-  console.log('✅ AcademicYear:', academicYear.id);
 
-  // ─── Department ──────────────────────────────────────────
+  // =====================================================
+  // Department
+  // =====================================================
   const department = await prisma.department.upsert({
-    where: { name: 'Computer Science' },
+    where: { code: 'INFO' },
     update: {},
     create: {
-      name: 'Computer Science',
+      name: 'Informatique',
       code: 'INFO',
-      description: 'Department of Computer Science and Engineering',
     },
   });
-  console.log('✅ Department:', department.id);
 
-  // ─── Program ─────────────────────────────────────────────
+  // =====================================================
+  // Program
+  // =====================================================
   const program = await prisma.program.upsert({
-    where: { code: 'GL' },
+    where: { code: 'ING-INFO' },
     update: {},
     create: {
-      name: 'Software Engineering',
-      code: 'GL',
-      level: 'Master',
-      description: 'Software Engineering program',
+      name: 'Ingénierie Informatique',
+      code: 'ING-INFO',
+      level: 'ING',
       departmentId: department.id,
     },
   });
-  console.log('✅ Program:', program.id);
 
-  // ─── Level ───────────────────────────────────────────────
-  const level = await prisma.level.upsert({
-    where: { id: 'seed-level-1' },
-    update: {},
-    create: {
-      id: 'seed-level-1',
-      name: '1st Year',
-      order: 1,
+  // =====================================================
+  // Level
+  // =====================================================
+  const level = await prisma.level.create({
+    data: {
+      name: '2ème année',
+      order: 2,
       programId: program.id,
     },
   });
-  console.log('✅ Level:', level.id);
 
-  // ─── Group ───────────────────────────────────────────────
-  const group = await prisma.group.upsert({
-    where: { code: 'GL1-A' },
-    update: {},
-    create: {
-      name: 'Group A',
-      code: 'GL1-A',
+  // =====================================================
+  // Group
+  // =====================================================
+  const group = await prisma.group.create({
+    data: {
+      name: 'Groupe 1',
+      code: 'Gr-1',
       levelId: level.id,
     },
   });
-  console.log('✅ Group:', group.id);
 
-  // ─── Admin User ──────────────────────────────────────────
-  const hashedPassword = await bcrypt.hash('admin123', 10);
-  const adminUser = await prisma.user.upsert({
-    where: { email: 'admin@univ.tn' },
-    update: {},
-    create: {
-      email: 'admin@univ.tn',
-      password: hashedPassword,
-      role: 'ADMIN',
-      firstName: 'Super',
-      lastName: 'Admin',
-      active: true,
+  // =====================================================
+  // Subjects
+  // =====================================================
+  const subject1 = await prisma.subject.create({
+    data: {
+      name: 'Programmation Web',
+      code: 'WEB02',
+      semester: 1,
+      programId: program.id,
     },
   });
 
-  await prisma.admin.upsert({
-    where: { userId: adminUser.id },
-    update: {},
-    create: {
-      userId: adminUser.id,
+  const subject2 = await prisma.subject.create({
+    data: {
+      name: 'Base de Données',
+      code: 'DB02',
+      semester: 1,
+      programId: program.id,
     },
   });
-  console.log('✅ Admin user: admin@univ.tn / admin123');
 
-  // ─── Summary ─────────────────────────────────────────────
-  console.log('\n📋 Use these IDs in your requests:');
-  console.log(`  academicYearId : ${academicYear.id}`);
-  console.log(`  departmentId   : ${department.id}`);
-  console.log(`  programId      : ${program.id}`);
-  console.log(`  groupId        : ${group.id}`);
-  console.log('\n🔐 Admin login: admin@univ.tn / admin123');
+  // =====================================================
+  // Teacher
+  // =====================================================
+  const teacherUser = await prisma.user.create({
+    data: {
+      email: 'teacher1@test.com',
+      password,
+      role: Role.TEACHER,
+      firstName: 'Ali',
+      lastName: 'Teacher',
+    },
+  });
+
+  const teacher = await prisma.teacher.create({
+    data: {
+      matricule: 'T-002',
+      userId: teacherUser.id,
+      departmentId: department.id,
+      specialty: 'Informatique',
+    },
+  });
+
+  // =====================================================
+  // Assign subjects to teacher
+  // =====================================================
+  await prisma.teacherSubject.createMany({
+    data: [
+      {
+        teacherId: teacher.id,
+        subjectId: subject1.id,
+        academicYearId: academicYear.id,
+        programId: program.id,
+        levelId: level.id,
+        courseType: CourseType.COURSE,
+      },
+      {
+        teacherId: teacher.id,
+        subjectId: subject2.id,
+        academicYearId: academicYear.id,
+        programId: program.id,
+        levelId: level.id,
+        courseType: CourseType.COURSE,
+      },
+    ],
+  });
+
+  // =====================================================
+  // Students
+  // =====================================================
+  for (let i = 1; i <= 5; i++) {
+    const user = await prisma.user.create({
+      data: {
+        email: `students${i}@test.com`,
+        password,
+        role: Role.STUDENT,
+        firstName: `Student${i}`,
+        lastName: 'Test',
+      },
+    });
+
+    await prisma.student.create({
+      data: {
+        matricule: `S-000${i}`,
+        userId: user.id,
+        departmentId: department.id,
+        programId: program.id,
+        groupId: group.id,
+        academicYearId: academicYear.id,
+      },
+    });
+  }
+
+  console.log('✅ SEED terminé avec succès');
 }
 
 main()
