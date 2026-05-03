@@ -1,6 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { authApi } from "../modules/auth/Apis/AuthApi";
 import { gradeApi } from "../modules/grade/Apis/GradeApi";
+import { courseApi } from "../modules/course/Apis/CourseApi";
 import { setupListeners } from "@reduxjs/toolkit/query";
 import authReducer from "../modules/auth/slices/authSlice";
 import toastReducer from "../slices/toast/toastSlice";
@@ -11,9 +12,14 @@ export const store = configureStore({
     toast: toastReducer,
     [authApi.reducerPath]: authApi.reducer,
     [gradeApi.reducerPath]: gradeApi.reducer,
+    [courseApi.reducerPath]: courseApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(authApi.middleware, gradeApi.middleware),
+    getDefaultMiddleware().concat(
+      authApi.middleware,
+      gradeApi.middleware,
+      courseApi.middleware,
+    ),
 });
 
 export type RootState = ReturnType<typeof store.getState>;

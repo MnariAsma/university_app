@@ -34,16 +34,16 @@ export class CourseController {
   //   return this.courseService.create(dto, file, req.user.id);
   // }
 
-@Post()
-@UseInterceptors(FileInterceptor('file'))
-@Roles(Role.ADMIN, Role.TEACHER)
-async create(
-  @UploadedFile() file: Express.Multer.File,
-  @Body() dto: createCourseDto,
-  @Req() req,
-) {
-  return this.courseService.create(dto, file, req.user.id);
-}
+  @Post()
+  @UseInterceptors(FileInterceptor('file'))
+  @Roles(Role.ADMIN, Role.TEACHER)
+  async create(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() dto: createCourseDto,
+    @Req() req,
+  ) {
+    return this.courseService.create(dto, file, req.user.id);
+  }
 
   @Roles(Role.ADMIN, Role.TEACHER)
   @Get('teacher')

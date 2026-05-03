@@ -10,4 +10,5 @@ export const PROFILE = "/profile";
 export const FORGOT_PASSWORD = "/forgot-password";
 export const RESET_PASSWORD = "/reset-password";
 export const GRADES = "/grades";
+export const COURSES = "/courses";
 export const NOTFOUND = "*";

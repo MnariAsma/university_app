@@ -26,9 +26,14 @@ export const gradeApi = createApi({
       providesTags: ["Placements"],
     }),
 
-    getStudents: builder.query<any[], { programId: string; levelId: string }>({
-      query: ({ programId, levelId }) =>
-        `/grades/students?programId=${programId}&levelId=${levelId}`,
+    getStudents: builder.query<any[], { programId: string; levelId: string; subjectId?: string; evaluationType?: string; semester?: number }>({
+      query: ({ programId, levelId, subjectId, evaluationType, semester }) => {
+        let url = `/grades/students?programId=${programId}&levelId=${levelId}`;
+        if (subjectId) url += `&subjectId=${subjectId}`;
+        if (evaluationType) url += `&evaluationType=${evaluationType}`;
+        if (semester) url += `&semester=${semester}`;
+        return url;
+      },
       providesTags: ["Students"],
     }),
 

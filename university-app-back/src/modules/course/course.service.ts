@@ -35,11 +35,24 @@ async create(
   });
 }
 
-  async findAllByTeacher(teacherId: string) {
-    return this.prisma.course.findMany({
-      where: { teacherId },
+  async findAllByTeacher(userId: string) {
+    console.log(`[findAllByTeacher] Called with userId: ${userId}`);
+    const teacher = await this.prisma.teacher.findFirst({
+      where: { userId },
+    });
+    
+    if (!teacher) {
+      console.log(`[findAllByTeacher] No teacher found for userId: ${userId}`);
+      return [];
+    }
+    
+    const courses = await this.prisma.course.findMany({
+      where: { teacherId: teacher.id },
       include: { subject: true },
     });
+    
+    console.log(`[findAllByTeacher] Found ${courses.length} courses for teacher.id: ${teacher.id}`);
+    return courses;
   }
 
 
@@ -59,12 +72,16 @@ async create(
     });
   }
 
-  async update(id: string, dto: UpdateCourseDto, file: Express.Multer.File | undefined, teacherId: string) {
+  async update(id: string, dto: UpdateCourseDto, file: Express.Multer.File | undefined, userId: string) {
+    const teacher = await this.prisma.teacher.findFirst({
+      where: { userId },
+    });
+    
     const course = await this.prisma.course.findUnique({
       where: { id },
     });
 
-    if (!course || course.teacherId !== teacherId) {
+    if (!course || !teacher || course.teacherId !== teacher.id) {
       throw new ForbiddenException('Not allowed');
     }
 
@@ -78,12 +95,16 @@ async create(
   }
 
 
-  async delete(id: string, teacherId: string) {
+  async delete(id: string, userId: string) {
+    const teacher = await this.prisma.teacher.findFirst({
+      where: { userId },
+    });
+    
     const course = await this.prisma.course.findUnique({
       where: { id },
     });
 
-    if (!course || course.teacherId !== teacherId) {
+    if (!course || !teacher || course.teacherId !== teacher.id) {
       throw new ForbiddenException('Not allowed');
     }
 
