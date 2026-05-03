@@ -15,11 +15,11 @@ const NotFoundPage = () => {
 
   return (
     <Container>
-      <Typography variant="h2" fontWeight="bold">
+      <Typography variant="h2" sx={{ fontWeight: "bold" }}>
         404
       </Typography>
 
-      <Typography variant="h6" color="text.secondary" mb={3}>
+      <Typography variant="h6" color="text.secondary" sx={{ mb: 3 }}>
         Oops! Page not found
       </Typography>
 

@@ -17,9 +17,7 @@ const AppLayout = ({ children }: LayoutProps) => {
       <Sidebar />
       <MainWrapper>
         <Header />
-        <ContentBox component="main">
-          {children}
-        </ContentBox>
+        <ContentBox component="main">{children}</ContentBox>
       </MainWrapper>
     </LayoutWrapper>
   );

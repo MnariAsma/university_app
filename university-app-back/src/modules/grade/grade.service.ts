@@ -64,13 +64,50 @@ export class GradeService {
     return this.prisma.level.findMany({ where: { programId } });
   }
 
-  async findStudents(programId: string, levelId: string) {
-    return this.prisma.student.findMany({
+  async findStudents(
+    programId: string, 
+    levelId: string, 
+    subjectId?: string, 
+    evaluationType?: string, 
+    semester?: number
+  ) {
+    let activeYearId: string | undefined;
+    
+    if (subjectId && evaluationType && semester) {
+      const activeYear = await this.prisma.academicYear.findFirst({ where: { active: true } });
+      if (activeYear) {
+        activeYearId = activeYear.id;
+      }
+    }
+
+    const students = await this.prisma.student.findMany({
       where: {
         programId,
         group: { is: { levelId } },
       },
-      include: { user: true, group: true },
+      include: { 
+        user: true, 
+        group: true,
+        ...(subjectId && evaluationType && semester && activeYearId ? {
+          grades: {
+            where: {
+              subjectId,
+              evaluationType,
+              semester,
+              academicYearId: activeYearId
+            }
+          }
+        } : {})
+      },
+    });
+
+    return students.map(s => {
+      const { grades, ...rest } = s as any;
+      const grade = grades?.[0]?.value;
+      return { 
+        ...rest, 
+        _grade: grade !== undefined && grade !== null ? grade : "" 
+      };
     });
   }
 

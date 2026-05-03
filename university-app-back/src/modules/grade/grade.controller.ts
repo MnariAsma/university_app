@@ -46,8 +46,17 @@ export class GradeController {
   async students(
     @Query('programId') programId: string,
     @Query('levelId') levelId: string,
+    @Query('subjectId') subjectId?: string,
+    @Query('evaluationType') evaluationType?: string,
+    @Query('semester') semester?: string,
   ) {
-    return this.gradeService.findStudents(programId, levelId);
+    return this.gradeService.findStudents(
+      programId, 
+      levelId, 
+      subjectId, 
+      evaluationType, 
+      semester ? Number(semester) : undefined
+    );
   }
 
   @Roles(Role.TEACHER, Role.ADMIN)

@@ -6,7 +6,7 @@ import {
   CalendarMonth,
   Grade as GradeIcon,
 } from "@mui/icons-material";
-import { DASHBOARD, MEETING_ROOM, RESERVATION, USERS, PROFILE, USER_DASHBOARD, MY_RESERVATIONS, GRADES } from "../routes/routes";
+import { DASHBOARD, MEETING_ROOM, RESERVATION, USERS, PROFILE, USER_DASHBOARD, MY_RESERVATIONS, GRADES, COURSES } from "../routes/routes";
 import { MENU_TEXT } from "./constants";
 
 export const menuItemsAdmin = [
@@ -20,6 +20,7 @@ export const menuItemsAdmin = [
 export const menuItemsTeacher = [
   { text: MENU_TEXT.dashboard, icon: <DashboardIcon />, path: DASHBOARD },
   { text: MENU_TEXT.grades, icon: <GradeIcon />, path: GRADES },
+  { text: "Cours", icon: <EventNote />, path: COURSES },
   { text: MENU_TEXT.profile, icon: <Person />, path: PROFILE },
 ];
 
