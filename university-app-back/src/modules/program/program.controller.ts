@@ -2,11 +2,12 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { ProgramService } from './program.service';
 import { CreateProgramDto } from './dto/createProgram.dto';
 import { UpdateProgramDto } from './dto/updateProgram.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 
 @ApiTags('programs')
+@ApiBearerAuth()
 @Controller('programs')
 export class ProgramController {
   constructor(private readonly programService: ProgramService) {}

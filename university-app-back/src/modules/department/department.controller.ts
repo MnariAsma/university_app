@@ -2,9 +2,10 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { DepartmentService } from './department.service';
 import { CreateDepartmentDto } from './dto/createDepartment.dto';
 import { UpdateDepartmentDto } from './dto/updateDepartment.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 
 @ApiTags('departments')
+@ApiBearerAuth()
 @Controller('departments')
 export class DepartmentController {
   constructor(private readonly departmentService: DepartmentService) {}

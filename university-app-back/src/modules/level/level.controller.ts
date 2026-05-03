@@ -2,11 +2,12 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@n
 import { LevelService } from './level.service';
 import { CreateLevelDto } from './dto/createLevel.dto';
 import { UpdateLevelDto } from './dto/updateLevel.dto';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 
 @ApiTags('Levels')
+@ApiBearerAuth()
 @Controller('levels')
 export class LevelController {
   constructor(private readonly levelService: LevelService) {}

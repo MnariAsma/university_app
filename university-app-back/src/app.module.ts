@@ -12,6 +12,7 @@ import { DepartmentModule } from './modules/department/department.module';
 import { SubjectModule } from './modules/subject/subject.module';
 import { ProgramModule } from './modules/program/program.module';
 import { GradeModule } from './modules/grade/grade.module';
+import { AbsenceModule } from './modules/absence/absence.module';
 
 import { LevelModule } from './modules/level/level.module';
 import { GroupModule } from './modules/group/group.module';
@@ -37,6 +38,7 @@ import { RolesGuard } from './common/guards/roles.guard';
     SubjectModule,
     ProgramModule,
     GradeModule,
+    AbsenceModule,
 
     // HEAD
     LevelModule,

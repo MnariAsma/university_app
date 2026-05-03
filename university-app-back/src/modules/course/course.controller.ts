@@ -14,11 +14,12 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { CourseService } from './course.service';
 import { createCourseDto } from './dto/createCourse.dto';
 import { UpdateCourseDto } from './dto/updateCourse.dto';
-import { ApiTags, ApiConsumes, ApiBody } from '@nestjs/swagger';
+import { ApiTags, ApiConsumes, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 
 @ApiTags('courses')
+@ApiBearerAuth()
 @Controller('courses')
 export class CourseController {
   constructor(private courseService: CourseService) {}

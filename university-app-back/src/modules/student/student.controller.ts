@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Param, Patch, Delete, Body } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { StudentService } from './student.service';
 import { CreateStudentDto } from './dto/createStudent.dto';
 import { UpdateStudentDto } from './dto/updateStudent.dto';
@@ -8,6 +8,7 @@ import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 
 @ApiTags('students')
+@ApiBearerAuth()
 @Controller('students')
 export class StudentController {
   constructor(private readonly studentService: StudentService) {}

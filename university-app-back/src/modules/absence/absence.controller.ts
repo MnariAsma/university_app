@@ -13,6 +13,7 @@ import {
   ApiParam,
   ApiQuery,
   ApiTags,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
 import { Roles } from 'src/common/decorators/roles.decorator';
@@ -22,6 +23,7 @@ import { MarkAttendanceDto } from './dto/mark-attendance.dto';
 import { UpdateAbsenceDto } from './dto/update-absence.dto';
 
 @ApiTags('absences')
+@ApiBearerAuth()
 @Controller('absences')
 export class AbsenceController {
   constructor(private readonly absenceService: AbsenceService) {}

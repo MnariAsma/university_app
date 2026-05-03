@@ -35,7 +35,7 @@ export class AbsenceService {
       where: { studentId, subjectId, status: AbsenceStatus.ABSENT },
     });
 
-    await this.prisma.StudentSubjectStatus.upsert({
+    await this.prisma.studentSubjectStatus.upsert({
       where: { studentId_subjectId: { studentId, subjectId } },
       create: { studentId, subjectId, absenceCount, eliminated: absenceCount >= ELIMINATION_THRESHOLD },
       update: { absenceCount, eliminated: absenceCount >= ELIMINATION_THRESHOLD },
