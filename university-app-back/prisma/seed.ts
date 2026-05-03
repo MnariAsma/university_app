@@ -1,6 +1,3 @@
-import dotenv from "dotenv";
-dotenv.config();
-
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient, Role, CourseType, SessionType } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
@@ -169,9 +166,16 @@ async function main() {
 
   // =====================================================
   // Assign subjects to teacher
+  // programId and levelId are optional but part of unique constraint
   // =====================================================
   const existingTs1 = await prisma.teacherSubject.findFirst({
-    where: { teacherId: teacher!.id, subjectId: subject1.id, academicYearId: academicYear.id },
+    where: {
+      teacherId: teacher!.id,
+      subjectId: subject1.id,
+      academicYearId: academicYear.id,
+      programId: program.id,
+      levelId: level.id,
+    },
   });
   if (!existingTs1) {
     await prisma.teacherSubject.create({
@@ -180,12 +184,20 @@ async function main() {
         subjectId: subject1.id,
         academicYearId: academicYear.id,
         courseType: CourseType.COURSE,
+        programId: program.id,
+        levelId: level.id,
       },
     });
   }
 
   const existingTs2 = await prisma.teacherSubject.findFirst({
-    where: { teacherId: teacher!.id, subjectId: subject2.id, academicYearId: academicYear.id },
+    where: {
+      teacherId: teacher!.id,
+      subjectId: subject2.id,
+      academicYearId: academicYear.id,
+      programId: program.id,
+      levelId: level.id,
+    },
   });
   if (!existingTs2) {
     await prisma.teacherSubject.create({
@@ -194,6 +206,8 @@ async function main() {
         subjectId: subject2.id,
         academicYearId: academicYear.id,
         courseType: CourseType.COURSE,
+        programId: program.id,
+        levelId: level.id,
       },
     });
   }
@@ -248,8 +262,8 @@ async function main() {
       groupId: group.id,
       roomId: room.id,
       adminId: admin!.id,
-      startDate: new Date(now.getTime() - 30 * 60 * 1000),   // 30 min ago
-      endDate: new Date(now.getTime() + 90 * 60 * 1000),      // 1h30 from now
+      startDate: new Date(now.getTime() - 30 * 60 * 1000),
+      endDate: new Date(now.getTime() + 90 * 60 * 1000),
     },
   });
 
@@ -262,12 +276,12 @@ async function main() {
       groupId: group.id,
       roomId: room.id,
       adminId: admin!.id,
-      startDate: new Date(now.getTime() + 2 * 60 * 60 * 1000),  // 2h from now
-      endDate: new Date(now.getTime() + 4 * 60 * 60 * 1000),    // 4h from now
+      startDate: new Date(now.getTime() + 2 * 60 * 60 * 1000),
+      endDate: new Date(now.getTime() + 4 * 60 * 60 * 1000),
     },
   });
 
-  // Session 3: DONE (ended 2 hours ago) - with some absences already marked
+  // Session 3: DONE (ended 2 hours ago)
   const doneSession = await prisma.session.create({
     data: {
       type: SessionType.COURSE,
@@ -276,8 +290,8 @@ async function main() {
       groupId: group.id,
       roomId: room.id,
       adminId: admin!.id,
-      startDate: new Date(now.getTime() - 4 * 60 * 60 * 1000),  // 4h ago
-      endDate: new Date(now.getTime() - 2 * 60 * 60 * 1000),    // 2h ago
+      startDate: new Date(now.getTime() - 4 * 60 * 60 * 1000),
+      endDate: new Date(now.getTime() - 2 * 60 * 60 * 1000),
     },
   });
 
@@ -292,66 +306,63 @@ async function main() {
       groupId: group.id,
       roomId: room.id,
       adminId: admin!.id,
-      startDate: new Date(yesterday.setHours(9, 0, 0, 0)),
-      endDate: new Date(yesterday.setHours(11, 0, 0, 0)),
+      startDate: new Date(new Date(yesterday).setHours(9, 0, 0, 0)),
+      endDate: new Date(new Date(yesterday).setHours(11, 0, 0, 0)),
     },
   });
 
   // =====================================================
-  // Mark attendance for DONE session (session 3)
-  // Students 1,2,3 = PRESENT | Students 4,5 = ABSENT
+  // Mark attendance for DONE sessions
   // =====================================================
   if (studentIds.length >= 5) {
-    const attendanceData = studentIds.map((studentId, index) => ({
-      studentId,
-      subjectId: subject2.id,
-      sessionId: doneSession.id,
-      status: index < 3 ? 'PRESENT' : 'ABSENT',
-    }));
-
-    for (const entry of attendanceData) {
+    // Session 3 (doneSession): students 1,2,3 = PRESENT | 4,5 = ABSENT
+    for (let i = 0; i < studentIds.length; i++) {
       await prisma.absence.create({
         data: {
-          studentId: entry.studentId,
-          subjectId: entry.subjectId,
-          sessionId: entry.sessionId,
-          status: entry.status as any,
+          studentId: studentIds[i],
+          subjectId: subject2.id,
+          sessionId: doneSession.id,
+          status: i < 3 ? 'PRESENT' : 'ABSENT',
         },
       });
     }
 
-    // Mark attendance for yesterday session too
-    // Students 1,2 = PRESENT | Students 3,4,5 = ABSENT
-    const yesterdayAttendance = studentIds.map((studentId, index) => ({
-      studentId,
-      subjectId: subject1.id,
-      sessionId: yesterdaySession.id,
-      status: index < 2 ? 'PRESENT' : 'ABSENT',
-    }));
-
-    for (const entry of yesterdayAttendance) {
+    // Yesterday session: students 1,2 = PRESENT | 3,4,5 = ABSENT
+    for (let i = 0; i < studentIds.length; i++) {
       await prisma.absence.create({
         data: {
-          studentId: entry.studentId,
-          subjectId: entry.subjectId,
-          sessionId: entry.sessionId,
-          status: entry.status as any,
+          studentId: studentIds[i],
+          subjectId: subject1.id,
+          sessionId: yesterdaySession.id,
+          status: i < 2 ? 'PRESENT' : 'ABSENT',
         },
       });
     }
 
-
+    // Update StudentSubjectStatus for all students in both subjects
+    for (const studentId of studentIds) {
+      for (const subjectId of [subject1.id, subject2.id]) {
+        const count = await prisma.absence.count({
+          where: { studentId, subjectId, status: 'ABSENT' },
+        });
+        await prisma.studentSubjectStatus.upsert({
+          where: { studentId_subjectId: { studentId, subjectId } },
+          create: { studentId, subjectId, absenceCount: count, eliminated: count >= 3 },
+          update: { absenceCount: count, eliminated: count >= 3 },
+        });
+      }
+    }
   }
 
   console.log('✅ Seed terminé avec succès');
-  console.log('─────────────────────────────────────');
-  console.log('👤 Admin:   admin@test.com     / 123456');
-  console.log('👨‍🏫 Teacher: teacher1@test.com  / 123456');
+  console.log('─────────────────────────────────────────────');
+  console.log('👤 Admin:    admin@test.com      / 123456');
+  console.log('👨‍🏫 Teacher:  teacher1@test.com   / 123456');
   console.log('👨‍🎓 Students: students1-5@test.com / 123456');
-  console.log('─────────────────────────────────────');
-  console.log(`📅 Active session ID:    ${activeSession.id}`);
-  console.log(`📅 Done session ID:      ${doneSession.id}`);
-  console.log(`📅 Yesterday session ID: ${yesterdaySession.id}`);
+  console.log('─────────────────────────────────────────────');
+  console.log(`📅 ACTIVE session ID:    ${activeSession.id}`);
+  console.log(`📅 DONE session ID:      ${doneSession.id}`);
+  console.log(`📅 YESTERDAY session ID: ${yesterdaySession.id}`);
 }
 
 main()

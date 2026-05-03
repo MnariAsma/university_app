@@ -1,25 +1,24 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import ProtectedRoute from "./routes/ProtectedRoute";
-
 import { ROLES } from "./constants/constants";
 import {
   AUTH,
   DASHBOARD,
   HOME,
   NOTFOUND,
-  RESERVATION,
   USERS,
   PROFILE,
   USER_DASHBOARD,
-  MY_RESERVATIONS,
   GRADES,
   COURSES,
+  PRESENCE,
 } from "./routes/routes";
 import ToastContainer from "./Components/Toasts/toast";
 import LoginPage from "./pages/LoginPage/loginPage";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import GradesPage from "./pages/GradesPage/GradesPage";
 import CoursesPage from "./pages/CoursesPage/CoursesPage";
+import PresencePage from "./pages/PresencePage/PresencePage";
 import NotFoundPage from "./pages/NotFoundPage/NotFoundPage";
 import AppLayout from "./Components/layout/AppLayout";
 
@@ -56,6 +55,14 @@ function App() {
               </AppLayout>
             }
           />
+          <Route
+            path={PRESENCE}
+            element={
+              <AppLayout>
+                <PresencePage />
+              </AppLayout>
+            }
+          />
         </Route>
 
         <Route path={NOTFOUND} element={<NotFoundPage />} />
@@ -63,4 +70,5 @@ function App() {
     </>
   );
 }
+
 export default App;

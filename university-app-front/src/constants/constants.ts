@@ -11,6 +11,7 @@ export const MENU_TEXT = {
   reservations: "Reservations",
   grades: "Grades",
   profile: "Profile",
+  presence: "Presence",
 };
 export const LOGOUT= {
     loginTitle: "Logout",
