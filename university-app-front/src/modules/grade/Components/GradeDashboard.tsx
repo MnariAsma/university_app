@@ -116,7 +116,7 @@ const GradeDashboard = () => {
     if (!programId || !levelId || !selectedSubject) {
       dispatch(
         addToast({
-          message: "Veuillez sélectionner la matière et la filière.",
+          message: "Please select a subject and program.",
           type: "error",
         }),
       );
@@ -160,29 +160,28 @@ const GradeDashboard = () => {
         sx={{ fontWeight: "bold", mb: 1 }}
         color="primary.main"
       >
-        Gestion des Notes
+        Grade Management
       </Typography>
-      <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-        Sélectionnez la matière et le groupe pour saisir les notes des
-        étudiants.
-      </Typography>
+      {/* <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+        Select the subject and the group to enter the students grades.
+      </Typography> */}
 
       <Card elevation={3} sx={{ mb: 4, borderRadius: 2 }}>
         <CardContent>
           <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
             <FilterList color="action" sx={{ mr: 1 }} />
             <Typography variant="h6" sx={{ fontWeight: "medium" }}>
-              Filtres de sélection
+             Select filters
             </Typography>
           </Box>
           <Divider sx={{ mb: 3 }} />
 
           <Box sx={{ display: "flex", gap: 3, flexWrap: "wrap" }}>
             <FormControl sx={{ minWidth: 220, flex: 1 }}>
-              <InputLabel>Matière</InputLabel>
+              <InputLabel>Subject</InputLabel>
               <Select
                 value={selectedSubject}
-                label="Matière"
+                label="Subject"
                 onChange={(e) => {
                   setSelectedSubject(e.target.value);
                   setSelectedPlacementIndex("");
@@ -201,10 +200,10 @@ const GradeDashboard = () => {
             </FormControl>
 
             <FormControl sx={{ minWidth: 220, flex: 1 }}>
-              <InputLabel>Filière - Niveau</InputLabel>
+              <InputLabel>Program - Level</InputLabel>
               <Select
                 value={selectedPlacementIndex}
-                label="Filière - Niveau"
+                label="Program - Level"
                 onChange={(e) =>
                   setSelectedPlacementIndex(
                     (e.target.value as any) === ""
@@ -239,7 +238,7 @@ const GradeDashboard = () => {
             </FormControl>
 
             <TextField
-              label="Semestre"
+              label="Semester"
               type="number"
               value={semester}
               onChange={(e) => setSemester(Number(e.target.value))}
@@ -290,10 +289,10 @@ const GradeDashboard = () => {
             <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
               <People sx={{ color: "primary.main" }} />
               <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                Liste des Étudiants
+                Students List
               </Typography>
               <Chip
-                label={`${students.length} étudiant${students.length > 1 ? "s" : ""}`}
+                label={`${students.length} student${students.length > 1 ? "s" : ""}`}
                 size="small"
                 sx={{
                   bgcolor: isDark
@@ -323,7 +322,7 @@ const GradeDashboard = () => {
                 },
               }}
             >
-              {isSaving ? "Enregistrement..." : "Enregistrer les notes"}
+              {isSaving ? "Recording..." : "Save Grades"}
             </Button>
           </Box>
 
@@ -340,12 +339,12 @@ const GradeDashboard = () => {
                 <TableCell
                   sx={{ fontWeight: 700, color: "primary.main", py: 2 }}
                 >
-                  Matricule
+                  Student ID
                 </TableCell>
                 <TableCell
                   sx={{ fontWeight: 700, color: "primary.main", py: 2 }}
                 >
-                  Nom & Prénom
+                  Name
                 </TableCell>
                 <TableCell
                   sx={{
@@ -355,7 +354,7 @@ const GradeDashboard = () => {
                     py: 2,
                   }}
                 >
-                  Note / 20
+                  Grade / 20
                 </TableCell>
               </TableRow>
             </TableHead>
@@ -424,10 +423,10 @@ const GradeDashboard = () => {
               color="text.secondary"
               sx={{ fontWeight: 500 }}
             >
-              Aucun étudiant trouvé pour cette sélection.
+              No students found for this selection.
             </Typography>
             <Typography variant="body2" color="text.disabled" sx={{ mt: 1 }}>
-              Essayez de changer la filière ou le niveau.
+              Try changing the program or level.
             </Typography>
           </Paper>
         )

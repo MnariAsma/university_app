@@ -189,12 +189,11 @@ const CourseDashboard = () => {
               color="text.primary"
               sx={{ fontWeight: 700 }}
             >
-              Mes Matières
+              My Subjects
             </Typography>
           </Box>
           <Typography variant="caption" color="text.secondary">
-            {subjects.length} matière{subjects.length > 1 ? "s" : ""} enseignée
-            {subjects.length > 1 ? "s" : ""}
+            {subjects.length} subject{subjects.length > 1 ? "s" : ""} taught
           </Typography>
         </Box>
 
@@ -326,8 +325,8 @@ const CourseDashboard = () => {
               {activeSubjectName}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              {filteredCourses.length} cours disponible
-              {filteredCourses.length > 1 ? "s" : ""}
+              {filteredCourses.length} course{" "}
+              {filteredCourses.length > 1 ? "s" : ""} available
             </Typography>
           </Box>
 
@@ -348,7 +347,7 @@ const CourseDashboard = () => {
               },
             }}
           >
-            {showAddForm ? "Fermer" : "Ajouter un cours"}
+            {showAddForm ? "close" : "Add a course"}
           </Button>
         </Box>
 
@@ -379,7 +378,7 @@ const CourseDashboard = () => {
                 color="primary.main"
                 sx={{ fontWeight: 600, mb: 5.5 }}
               >
-                Nouveau cours — {activeSubjectName}
+                New course — {activeSubjectName}
               </Typography>
 
               <Divider sx={{ mb: 3 }} />
@@ -388,7 +387,7 @@ const CourseDashboard = () => {
                   <TextField
                     fullWidth
                     required
-                    label="Titre du cours"
+                    label="Title of the course"
                     value={courseTitle}
                     onChange={(e) => setCourseTitle(e.target.value)}
                     size="small"
@@ -435,7 +434,7 @@ const CourseDashboard = () => {
                       startIcon={<PictureAsPdf />}
                       sx={{ textTransform: "none", borderRadius: 2 }}
                     >
-                      {file ? file.name : "Choisir un fichier PDF"}
+                      {file ? file.name : "Choose a PDF file"}
                       <input
                         type="file"
                         hidden
@@ -456,7 +455,7 @@ const CourseDashboard = () => {
                         boxShadow: "none",
                       }}
                     >
-                      {isAdding ? "Envoi..." : "Enregistrer"}
+                      {isAdding ? "Sending..." : "Save"}
                     </Button>
                   </Box>
                 </Grid>
@@ -569,7 +568,7 @@ const CourseDashboard = () => {
                           lineHeight: 1.6,
                         }}
                       >
-                        {course.description || "Aucune description fournie."}
+                        {course.description || "No description provided."}
                       </Typography>
                       <Box
                         sx={{
@@ -618,7 +617,7 @@ const CourseDashboard = () => {
                               },
                             }}
                           >
-                            Ouvrir le fichier
+                           Open File
                           </Button>
                         </Box>
                       </>
@@ -637,14 +636,14 @@ const CourseDashboard = () => {
                 color="text.secondary"
                 sx={{ fontWeight: 500 }}
               >
-                Aucun cours pour cette matière
+                No courses for this subject
               </Typography>
               <Typography
                 variant="body2"
                 color="text.disabled"
                 sx={{ mt: 1, mb: 3 }}
               >
-                Commencez par ajouter votre premier cours.
+             Start by adding your first course.
               </Typography>
               <Button
                 variant="contained"
@@ -658,7 +657,7 @@ const CourseDashboard = () => {
                   boxShadow: "none",
                 }}
               >
-                Ajouter un cours
+                Add a course
               </Button>
             </Box>
           )}

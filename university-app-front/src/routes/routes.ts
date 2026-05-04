@@ -11,5 +11,7 @@ export const FORGOT_PASSWORD = "/forgot-password";
 export const RESET_PASSWORD = "/reset-password";
 export const GRADES = "/grades";
 export const COURSES = "/courses";
-export const PRESENCE = "/presence";   // ← new
+
+export const PRESENCE = "/presence";  
+export const ANNOUNCEMENTS = "/announcements";
 export const NOTFOUND = "*";

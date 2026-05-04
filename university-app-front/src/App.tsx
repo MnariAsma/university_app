@@ -12,6 +12,9 @@ import {
   GRADES,
   COURSES,
   PRESENCE,
+
+  ANNOUNCEMENTS,
+
 } from "./routes/routes";
 import ToastContainer from "./Components/Toasts/toast";
 import LoginPage from "./pages/LoginPage/loginPage";
@@ -21,6 +24,7 @@ import CoursesPage from "./pages/CoursesPage/CoursesPage";
 import PresencePage from "./pages/PresencePage/PresencePage";
 import NotFoundPage from "./pages/NotFoundPage/NotFoundPage";
 import AppLayout from "./Components/layout/AppLayout";
+import AnnouncementDashboard from "./modules/announcement/Components/AnnouncementDashboard";
 
 function App() {
   return (
@@ -56,10 +60,19 @@ function App() {
             }
           />
           <Route
+
             path={PRESENCE}
             element={
               <AppLayout>
                 <PresencePage />
+              </AppLayout>
+            }
+          />
+          <Route
+            path={ANNOUNCEMENTS}
+            element={
+              <AppLayout>
+                <AnnouncementDashboard />
               </AppLayout>
             }
           />

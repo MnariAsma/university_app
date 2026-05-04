@@ -21,6 +21,7 @@ import { RoomModule } from './modules/room/room.module';
 import { CourseModule } from './modules/course/course.module';
 import { StudentModule } from './modules/student/student.module';
 import { MailModule } from './modules/mail/mail.module';
+import { AnnouncementsModule } from './modules/announcements/announcements.module';
 import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './common/guards/roles.guard';
@@ -49,6 +50,7 @@ import { RolesGuard } from './common/guards/roles.guard';
     CourseModule,
     StudentModule,
     MailModule,
+    AnnouncementsModule,
   ],
   controllers: [AppController],
   providers: [
