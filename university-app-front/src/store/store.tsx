@@ -3,6 +3,7 @@ import { authApi } from "../modules/auth/Apis/AuthApi";
 import { gradeApi } from "../modules/grade/Apis/GradeApi";
 import { courseApi } from "../modules/course/Apis/CourseApi";
 import { presenceApi } from "../modules/presence/Apis/PresenceApi";
+import { timetableApi } from "../modules/timetable/Apis/TimetableApi";
 import { setupListeners } from "@reduxjs/toolkit/query";
 import authReducer from "../modules/auth/slices/authSlice";
 import toastReducer from "../slices/toast/toastSlice";
@@ -15,6 +16,7 @@ export const store = configureStore({
     [gradeApi.reducerPath]: gradeApi.reducer,
     [courseApi.reducerPath]: courseApi.reducer,
     [presenceApi.reducerPath]: presenceApi.reducer,
+    [timetableApi.reducerPath]: timetableApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -22,6 +24,7 @@ export const store = configureStore({
       gradeApi.middleware,
       courseApi.middleware,
       presenceApi.middleware,
+      timetableApi.middleware,
     ),
 });
 

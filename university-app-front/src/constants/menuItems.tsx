@@ -6,6 +6,7 @@ import {
   CalendarMonth,
   Grade as GradeIcon,
   HowToReg,
+  CalendarViewWeek,
 } from "@mui/icons-material";
 import {
   DASHBOARD,
@@ -18,6 +19,7 @@ import {
   GRADES,
   COURSES,
   PRESENCE,
+  TIMETABLE, // ← new
 } from "../routes/routes";
 import { MENU_TEXT } from "./constants";
 
@@ -33,7 +35,8 @@ export const menuItemsTeacher = [
   { text: MENU_TEXT.dashboard, icon: <DashboardIcon />, path: DASHBOARD },
   { text: MENU_TEXT.grades, icon: <GradeIcon />, path: GRADES },
   { text: "Cours", icon: <EventNote />, path: COURSES },
-  { text: MENU_TEXT.presence, icon: <HowToReg />, path: PRESENCE },  // ← new
+  { text: MENU_TEXT.presence, icon: <HowToReg />, path: PRESENCE },  
+    { text: "Timetable", icon: <CalendarViewWeek />, path: TIMETABLE },// ← new
   { text: MENU_TEXT.profile, icon: <Person />, path: PROFILE },
 ];
 

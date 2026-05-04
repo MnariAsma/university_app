@@ -13,6 +13,7 @@ import { SubjectModule } from './modules/subject/subject.module';
 import { ProgramModule } from './modules/program/program.module';
 import { GradeModule } from './modules/grade/grade.module';
 import { AbsenceModule } from './modules/absence/absence.module';
+import { TimetableModule } from './modules/timetable/timetable.module';
 
 import { LevelModule } from './modules/level/level.module';
 import { GroupModule } from './modules/group/group.module';
@@ -39,6 +40,7 @@ import { RolesGuard } from './common/guards/roles.guard';
     ProgramModule,
     GradeModule,
     AbsenceModule,
+    TimetableModule,
 
     // HEAD
     LevelModule,
