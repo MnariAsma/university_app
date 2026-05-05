@@ -4,6 +4,7 @@ import { ROLES } from "./constants/constants";
 import {
   AUTH,
   DASHBOARD,
+  USER_DASHBOARD,
   HOME,
   NOTFOUND,
   GRADES,
@@ -16,6 +17,7 @@ import {
 import ToastContainer from "./Components/Toasts/toast";
 import LoginPage from "./pages/LoginPage/loginPage";
 import TeacherDashboard from "./pages/TeacherDashboard";
+import StudentDashboardPage from "./pages/StudentDashboard/StudentDashboardPage";
 import GradesPage from "./pages/GradesPage/GradesPage";
 import CoursesPage from "./pages/CoursesPage/CoursesPage";
 import PresencePage from "./pages/PresencePage/PresencePage";
@@ -58,6 +60,14 @@ function App() {
 
         {/* Student routes */}
         <Route element={<ProtectedRoute allowedRoles={[ROLES.STUDENT]} />}>
+          <Route
+            path={USER_DASHBOARD}
+            element={
+              <AppLayout>
+                <StudentDashboardPage />
+              </AppLayout>
+            }
+          />
           <Route
             path={REQUESTS}
             element={
