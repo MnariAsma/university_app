@@ -14,7 +14,7 @@ import {
   useMediaQuery,
   Box,
 } from "@mui/material";
-import { Business } from "@mui/icons-material";
+import SchoolIcon from "@mui/icons-material/School";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAppSelector } from "../../hooks/reduxHooks";
 import { useAuth } from "../../modules/auth/hooks/useAuth";
@@ -56,11 +56,11 @@ const Sidebar = () => {
         {open && (
           <SidebarBrand>
             <SidebarAvatarBrand>
-              <Business />
+              <SchoolIcon />
             </SidebarAvatarBrand>
-            <Typography variant="h6" color="primary.main" sx={{ fontWeight: "bold" }}>
-              Book Room
-            </Typography>
+<Typography variant="h6" color="primary.main" sx={{ fontWeight: "bold" }}>
+  ISSATSO+
+</Typography>
           </SidebarBrand>
         )}
         <IconButton onClick={toggleSidebar}>
