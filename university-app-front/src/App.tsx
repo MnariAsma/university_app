@@ -23,6 +23,7 @@ import CoursesPage from "./pages/CoursesPage/CoursesPage";
 import PresencePage from "./pages/PresencePage/PresencePage";
 import TimetablePage from "./pages/TimetablePage/TimetablePage";
 import NotFoundPage from "./pages/NotFoundPage/NotFoundPage";
+import AnnouncementsPage from "./pages/AnnouncementsPage/AnnouncementsPage";
 import AppLayout from "./Components/layout/AppLayout";
 import AnnouncementDashboard from "./modules/announcement/Components/AnnouncementDashboard";
 import RequestsPage from "./pages/RequestsPage/RequestsPage";
@@ -53,14 +54,7 @@ function App() {
               </AppLayout>
             }
           />
-          <Route
-            path={ANNOUNCEMENTS}
-            element={
-              <AppLayout>
-                <AnnouncementDashboard />
-              </AppLayout>
-            }
-          />
+
         </Route>
 
         {/* Student routes */}
@@ -98,6 +92,14 @@ function App() {
             element={
               <AppLayout>
                 <GradesPage />
+              </AppLayout>
+            }
+          />
+          <Route
+            path={ANNOUNCEMENTS}
+            element={
+              <AppLayout>
+                <AnnouncementsPage />
               </AppLayout>
             }
           />
