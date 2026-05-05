@@ -58,7 +58,7 @@ const Sidebar = () => {
             <SidebarAvatarBrand>
               <Business />
             </SidebarAvatarBrand>
-            <Typography variant="h6" fontWeight="bold" color="primary.main">
+            <Typography variant="h6" color="primary.main" sx={{ fontWeight: "bold" }}>
               Book Room
             </Typography>
           </SidebarBrand>
@@ -95,7 +95,7 @@ const Sidebar = () => {
 
       <Divider />
 
-      <Box p={2}>
+      <Box sx={{ p: 2 }}>
         <SidebarLogoutButton
           open={open}
           variant="outlined"
@@ -131,7 +131,7 @@ const Sidebar = () => {
   </SidebarAvatarUser>
 
   <Box>
-    <Typography variant="body2" fontWeight="medium">
+    <Typography variant="body2" sx={{ fontWeight: "medium" }}>
       {user?.firstName} {user?.lastName}
     </Typography>
     <Typography variant="caption" color="text.secondary">

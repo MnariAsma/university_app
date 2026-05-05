@@ -15,6 +15,7 @@ export const MENU_TEXT = {
   requests: "Requests",
   Courses:"Courses",
   Grades:"Grades",
+  Timetable:"Timetable",
 };
 export const LOGOUT= {
     loginTitle: "Logout",

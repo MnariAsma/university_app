@@ -57,5 +57,7 @@ export const menuItemsUser = [
   { text: MENU_TEXT.Courses, icon: <EventNote />, path: COURSES },
   { text: MENU_TEXT.Grades, icon: <GradeIcon />, path: GRADES },
   { text: MENU_TEXT.requests, icon: <DescriptionIcon />, path: REQUESTS },
+  { text: MENU_TEXT.Timetable, icon: <CalendarViewWeek />, path: TIMETABLE },
+  { text: MENU_TEXT.reservations, icon: <CalendarMonth />, path: MY_RESERVATIONS },
   { text: MENU_TEXT.profile, icon: <Person />, path: PROFILE },
 ];

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Grades() {
   const [subjects, setSubjects] = useState<any[]>([]);
@@ -77,7 +77,7 @@ export default function Grades() {
     })
       .then((r) => { if (r.status === 401) throw new Error('unauth'); return r.json() })
       .then((res) => alert('Saved ' + (res?.length || 0) + ' grades'))
-      .catch((err) => alert('Save failed'));
+      .catch(() => alert('Save failed'));
   }
 
   return (

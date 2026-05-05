@@ -7,8 +7,8 @@ export const useAuth = () => {
   const { user, token } = useAppSelector((state) => state.auth);
 
   const [login, { isLoading }] = useLoginMutation();
-  // const [forgotPassword, { isLoading: isForgotLoading }] = useForgotPasswordMutation();
-  // const [resetPassword, { isLoading: isResetLoading }] = useResetPasswordMutation();
+  const isForgotLoading = false;
+  const isResetLoading = false;
   const handleLogin = async (email: string, password: string) => {
     try {
       const response = await login({ email, password }).unwrap();
@@ -33,39 +33,31 @@ export const useAuth = () => {
     dispatch(clearCredentials());
   };
 
-  // const handleForgotPassword = async (email: string) => {
-  //   try {
-  //     const response = await forgotPassword({ email }).unwrap();
-  //     return { status: 200, message: response.message };
-  //   } catch (err: any) {
-  //     return {
-  //       status: err?.status || 500,
-  //       error: err?.data?.message || err?.error || "Erreur inconnue",
-  //     };
-  //   }
-  // };
+  const handleForgotPassword = async (_email: string): Promise<{ status: number; message?: string; error?: string }> => {
+    return {
+      status: 501,
+      message: "Forgot password API is not configured yet.",
+      error: "Forgot password API is not configured yet.",
+    };
+  };
 
-  // const handleResetPassword = async (data: any) => {
-  //   try {
-  //     const response = await resetPassword(data).unwrap();
-  //     return { status: 200, message: response.message };
-  //   } catch (err: any) {
-  //     return {
-  //       status: err?.status || 500,
-  //       error: err?.data?.message || err?.error || "Erreur inconnue",
-  //     };
-  //   }
-  // };
+  const handleResetPassword = async (_data: { token: string; newPassword: string }): Promise<{ status: number; message?: string; error?: string }> => {
+    return {
+      status: 501,
+      message: "Reset password API is not configured yet.",
+      error: "Reset password API is not configured yet.",
+    };
+  };
 
   return {
     user,
     token,
     handleLogin,
     handleLogout,
-    // handleForgotPassword,
-    // handleResetPassword,
+    handleForgotPassword,
+    handleResetPassword,
     isLoading,
-    // isForgotLoading,
-    // isResetLoading,
+    isForgotLoading,
+    isResetLoading,
   };
 };

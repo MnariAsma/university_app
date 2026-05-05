@@ -1,4 +1,3 @@
-import React from "react";
 import CourseDashboard from "../../modules/course/Components/CourseDashboard";
 import StudentCourseDashboard from "../../modules/course/Components/StudentCourseDashboard";
 import { useAuth } from "../../modules/auth/hooks/useAuth";

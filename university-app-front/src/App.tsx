@@ -6,8 +6,6 @@ import {
   DASHBOARD,
   HOME,
   NOTFOUND,
-  PROFILE,
-  USER_DASHBOARD,
   GRADES,
   COURSES,
   PRESENCE,
@@ -63,6 +61,17 @@ function App() {
           />
         </Route>
 
+        <Route element={<ProtectedRoute allowedRoles={[ROLES.TEACHER, ROLES.STUDENT]} />}>
+          <Route
+            path={TIMETABLE}
+            element={
+              <AppLayout>
+                <TimetablePage />
+              </AppLayout>
+            }
+          />
+        </Route>
+
         {/* Student routes */}
         <Route element={<ProtectedRoute allowedRoles={[ROLES.STUDENT]} />}>
           <Route
@@ -70,14 +79,6 @@ function App() {
             element={
               <AppLayout>
                 <RequestsPage />
-              </AppLayout>
-            }
-          />
-          <Route
-            path={TIMETABLE}
-            element={
-              <AppLayout>
-                <TimetablePage />
               </AppLayout>
             }
           />

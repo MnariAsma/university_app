@@ -1,4 +1,3 @@
-import React from "react";
 import GradeDashboard from "../../modules/grade/Components/GradeDashboard";
 import StudentGradeDashboard from "../../modules/grade/Components/StudentGradeDashboard";
 import { useAuth } from "../../modules/auth/hooks/useAuth";
