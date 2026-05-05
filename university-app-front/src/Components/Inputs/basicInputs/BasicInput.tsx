@@ -27,8 +27,10 @@ export default function BasicInput({
           error={!!fieldState.error}
           helperText={fieldState.error?.message}
           value={field.value ?? ""}
-          InputLabelProps={{
-            shrink: type === "date" || type === "time" ? true : undefined,
+          slotProps={{
+            inputLabel: {
+              shrink: type === "date" || type === "time" ? true : undefined,
+            },
           }}
         />
       )}

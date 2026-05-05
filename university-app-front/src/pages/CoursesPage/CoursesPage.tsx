@@ -1,4 +1,3 @@
-import React from "react";
 import CourseDashboard from "../../modules/course/Components/CourseDashboard";
 
 const CoursesPage = () => {

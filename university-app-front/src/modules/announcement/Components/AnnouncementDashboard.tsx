@@ -20,7 +20,7 @@ const AnnouncementDashboard: React.FC = () => {
   return (
     <Box sx={{ p: 3 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4" fontWeight="bold">
+        <Typography variant="h4" sx={{ fontWeight: "bold" }}>
           Announcements
         </Typography>
         <Button
@@ -59,7 +59,7 @@ const AnnouncementDashboard: React.FC = () => {
                     {new Date(announcement.createdAt).toLocaleDateString()}
                   </TableCell>
                   <TableCell>
-                    <Typography variant="body1" fontWeight="medium">
+                    <Typography variant="body1" sx={{ fontWeight: "medium" }}>
                       {announcement.title}
                     </Typography>
                     <Typography variant="body2" color="text.secondary" noWrap sx={{ maxWidth: 300 }}>

@@ -39,7 +39,7 @@ const DeleteDialog = ({
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>{strings.DELETE_DIALOG_TITLE}</DialogTitle>
       <DialogContent>
-        <Stack direction="column" alignItems="center" spacing={2} mt={1}>
+        <Stack direction="column" spacing={2} sx={{ alignItems: "center", mt: 1 }}>
           <ReportIcon fontSize="large" color="error" />
           <Typography>{strings.DELETE_DIALOG_MESSAGE}</Typography>
         </Stack>

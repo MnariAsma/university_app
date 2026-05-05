@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Box,
   Typography,
@@ -13,7 +13,6 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
   FormControl,
   InputLabel,
   Select,
@@ -23,7 +22,6 @@ import {
   Alert,
   CircularProgress,
   Dialog,
-  DialogTitle,
   DialogContent,
   DialogActions,
   IconButton,
@@ -36,7 +34,6 @@ import {
   Add as AddIcon,
   Description as DescriptionIcon,
   School as SchoolIcon,
-  Work as WorkIcon,
   CheckCircle as CheckCircleIcon,
   Cancel as CancelIcon,
   HourglassEmpty as PendingIcon,
@@ -132,7 +129,6 @@ export default function StudentRequestsDashboard() {
   const [reason, setReason] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
 
   const resetForm = () => {
     setStep(0);
@@ -142,7 +138,6 @@ export default function StudentRequestsDashboard() {
     setReason("");
     setFile(null);
     setError("");
-    setSuccess(false);
   };
 
   const handleOpen = () => {
@@ -215,7 +210,6 @@ export default function StudentRequestsDashboard() {
 
     try {
       await createRequest(formData).unwrap();
-      setSuccess(true);
       setStep(3);
     } catch (e: any) {
       setError(
@@ -223,10 +217,6 @@ export default function StudentRequestsDashboard() {
       );
     }
   };
-
-  const pendingCount = requests.filter((r) => r.status === "PENDING").length;
-  const acceptedCount = requests.filter((r) => r.status === "ACCEPTED").length;
-  const refusedCount = requests.filter((r) => r.status === "REFUSED").length;
 
   const cardBg = isDark ? "rgba(255,255,255,0.04)" : "#fff";
   const borderColor = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)";
@@ -591,7 +581,7 @@ export default function StudentRequestsDashboard() {
                     (typeof CATEGORY_INFO)["INTERNSHIP"],
                   ][]
                 ).map(([key, info]) => (
-                    <Grid item xs={12} key={key}>
+                    <Grid size={12} key={key}>
                     <Card
                       onClick={() => handleCategorySelect(key)}
                       elevation={0}
@@ -664,7 +654,7 @@ export default function StudentRequestsDashboard() {
               </Typography>
               <Grid container spacing={2}>
                 {CATEGORY_INFO[selectedCategory].types.map((t) => (
-                  <Grid item xs={12} key={t.value}>
+                  <Grid size={12} key={t.value}>
                     <Card
                       onClick={() => {
                         setSelectedType(t.value);

@@ -32,7 +32,6 @@ import {
 } from "@mui/icons-material";
 import {
   useGetTeacherSubjectsQuery,
-  useGetPlacementsQuery,
 } from "../../grade/Apis/GradeApi";
 import {
   useGetTeacherCoursesQuery,
@@ -49,9 +48,6 @@ const CourseDashboard = () => {
 
   // Selections
   const [selectedSubject, setSelectedSubject] = useState<string>("");
-  const [selectedPlacementIndex, setSelectedPlacementIndex] = useState<
-    number | ""
-  >("");
 
   // Add Course Form
   const [showAddForm, setShowAddForm] = useState(false);
@@ -62,9 +58,6 @@ const CourseDashboard = () => {
 
   // Queries & Mutations
   const { data: subjects = [] } = useGetTeacherSubjectsQuery();
-  const { data: placements = [] } = useGetPlacementsQuery(selectedSubject, {
-    skip: !selectedSubject,
-  });
   const { data: courses = [], isLoading: isLoadingCourses } =
     useGetTeacherCoursesQuery();
   const [addCourse, { isLoading: isAdding }] = useAddCourseMutation();
@@ -211,7 +204,6 @@ const CourseDashboard = () => {
                 selected={isSelected}
                 onClick={() => {
                   setSelectedSubject(id);
-                  setSelectedPlacementIndex("");
                 }}
                 sx={{
                   borderRadius: 2,
