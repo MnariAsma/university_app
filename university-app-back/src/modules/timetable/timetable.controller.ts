@@ -1,10 +1,9 @@
 import { Controller, Get, Param, Query, Request } from '@nestjs/common';
-import { ApiOperation, ApiParam, ApiQuery, ApiTags,ApiBearerAuth } from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiQuery, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { Roles } from 'src/common/decorators/roles.decorator';
+import { Role } from 'src/modules/users/dto/createUser.dto';
 import { TimetableQueryDto } from './dto/timetable-query.dto';
 import { TimetableService } from './timetable.service';
-
-type AppRole = Parameters<typeof Roles>[number];
 
 @ApiTags('timetable')
 @ApiBearerAuth()
@@ -14,7 +13,7 @@ export class TimetableController {
 
   // ── TEACHER: get own timetable ────────────────────────────────────────────
   @Get('teacher')
-  @Roles('TEACHER' as AppRole)
+  @Roles(Role.TEACHER)
   @ApiOperation({
     summary: 'Get teacher timetable for a week',
     description:
@@ -27,7 +26,7 @@ export class TimetableController {
 
   // ── STUDENT: get own timetable ────────────────────────────────────────────
   @Get('student')
-  @Roles('STUDENT' as AppRole)
+  @Roles(Role.STUDENT)
   @ApiOperation({
     summary: 'Get student timetable for a week',
     description:
@@ -40,7 +39,7 @@ export class TimetableController {
 
   // ── ADMIN: get timetable for any teacher ──────────────────────────────────
   @Get('teacher/:teacherId')
-  @Roles('ADMIN' as AppRole)
+  @Roles(Role.ADMIN)
   @ApiOperation({ summary: 'Admin: get timetable for a specific teacher' })
   @ApiParam({ name: 'teacherId', description: 'Teacher record ID' })
   @ApiQuery({ name: 'weekStart', required: false })
@@ -53,7 +52,7 @@ export class TimetableController {
 
   // ── ADMIN: get timetable for a group ──────────────────────────────────────
   @Get('group/:groupId')
-  @Roles('ADMIN' as AppRole)
+  @Roles(Role.ADMIN)
   @ApiOperation({ summary: 'Admin: get timetable for a specific group' })
   @ApiParam({ name: 'groupId', description: 'Group ID' })
   @ApiQuery({ name: 'weekStart', required: false })
@@ -64,3 +63,7 @@ export class TimetableController {
     return this.timetableService.getGroupTimetable(groupId, query);
   }
 }
+
+
+
+

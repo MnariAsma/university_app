@@ -16,12 +16,11 @@ import {
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import { Roles } from 'src/common/decorators/roles.decorator';
+import { Role } from 'src/modules/users/dto/createUser.dto';
 import { AbsenceService } from './absence.service';
 import { AttendanceFilterDto } from './dto/attendance-filter.dto';
 import { MarkAttendanceDto } from './dto/mark-attendance.dto';
 import { UpdateAbsenceDto } from './dto/update-absence.dto';
-
-type AppRole = Parameters<typeof Roles>[number];
 
 @ApiTags('absences')
 @ApiBearerAuth()
@@ -34,7 +33,7 @@ export class AbsenceController {
   // ══════════════════════════════════════════════════════════════════
 
   @Get('teacher/current-session')
-  @Roles('TEACHER' as AppRole)
+  @Roles(Role.TEACHER)
   @ApiOperation({
     summary: 'Get current active session',
     description: 'Returns the session happening right now for the logged-in teacher. Used on dashboard homepage.',
@@ -44,7 +43,7 @@ export class AbsenceController {
   }
 
   @Get('teacher/sessions/today')
-  @Roles('TEACHER' as AppRole)
+  @Roles(Role.TEACHER)
   @ApiOperation({
     summary: 'Get all sessions for today',
     description: 'Returns all sessions for today classified as ACTIVE, UPCOMING or DONE.',
@@ -54,7 +53,7 @@ export class AbsenceController {
   }
 
   @Get('teacher/history')
-  @Roles('TEACHER' as AppRole)
+  @Roles(Role.TEACHER)
   @ApiOperation({
     summary: 'Get attendance history',
     description: 'Returns all past sessions with attendance summary. Filterable by date, group and subject.',
@@ -67,7 +66,7 @@ export class AbsenceController {
   }
 
   @Get('teacher/session/:sessionId')
-  @Roles('TEACHER' as AppRole)
+  @Roles(Role.TEACHER)
   @ApiOperation({
     summary: 'Get student list for a session',
     description: 'Returns all students in the session group with their current attendance status. Used when teacher opens a session.',
@@ -81,7 +80,7 @@ export class AbsenceController {
   }
 
   @Post('teacher/session/:sessionId')
-  @Roles('TEACHER' as AppRole)
+  @Roles(Role.TEACHER)
   @ApiOperation({
     summary: 'Mark or update attendance for a session',
     description: 'Submit attendance list for a session. Can be called multiple times — updates existing records. Send full list or partial.',
@@ -100,7 +99,7 @@ export class AbsenceController {
   // ══════════════════════════════════════════════════════════════════
 
   @Get('student/my')
-  @Roles('STUDENT' as AppRole)
+  @Roles(Role.STUDENT)
   @ApiOperation({
     summary: 'Get my absences',
     description: 'Student views all their absences across all subjects.',
@@ -110,7 +109,7 @@ export class AbsenceController {
   }
 
   @Get('student/my/subject/:subjectId')
-  @Roles('STUDENT' as AppRole)
+  @Roles(Role.STUDENT)
   @ApiOperation({
     summary: 'Get my absences for a specific subject',
     description: 'Returns absences + elimination status for one subject.',
@@ -128,7 +127,7 @@ export class AbsenceController {
   // ══════════════════════════════════════════════════════════════════
 
   @Get('admin/student/:studentId')
-  @Roles('ADMIN' as AppRole)
+  @Roles(Role.ADMIN)
   @ApiOperation({
     summary: 'Get full absence report for a student',
     description: 'Admin views all absences and subject statuses for any student.',
@@ -139,7 +138,7 @@ export class AbsenceController {
   }
 
   @Patch('admin/:id')
-  @Roles('ADMIN' as AppRole)
+  @Roles(Role.ADMIN)
   @ApiOperation({
     summary: 'Update an absence record',
     description: 'Admin corrects an absence status. Automatically recalculates elimination.',
@@ -149,3 +148,7 @@ export class AbsenceController {
     return this.absenceService.updateAbsence(id, dto);
   }
 }
+
+
+
+

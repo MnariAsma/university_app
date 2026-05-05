@@ -15,10 +15,8 @@ import { CourseService } from './course.service';
 import { createCourseDto } from './dto/createCourse.dto';
 import { UpdateCourseDto } from './dto/updateCourse.dto';
 import { ApiTags, ApiConsumes, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
-
 import { Roles } from 'src/common/decorators/roles.decorator';
-
-type AppRole = Parameters<typeof Roles>[number];
+import { Role } from 'src/modules/users/dto/createUser.dto';
 
 @ApiTags('courses')
 @ApiBearerAuth()
@@ -38,7 +36,7 @@ export class CourseController {
 
   @Post()
   @UseInterceptors(FileInterceptor('file'))
-  @Roles('ADMIN' as AppRole, 'TEACHER' as AppRole)
+  @Roles(Role.ADMIN, Role.TEACHER)
   async create(
     @UploadedFile() file: Express.Multer.File,
     @Body() dto: createCourseDto,
@@ -47,19 +45,19 @@ export class CourseController {
     return this.courseService.create(dto, file, req.user.id);
   }
 
-  @Roles('ADMIN' as AppRole, 'TEACHER' as AppRole)
+  @Roles(Role.ADMIN, Role.TEACHER)
   @Get('teacher')
   findMyCourses(@Req() req) {
     return this.courseService.findAllByTeacher(req.user.id);
   }
 
-  @Roles('ADMIN' as AppRole, 'STUDENT' as AppRole)
+  @Roles(Role.ADMIN, Role.STUDENT)
   @Get('student')
   findForStudent(@Req() req) {
     return this.courseService.findForStudent(req.user.id);
   }
 
-  @Roles('ADMIN' as AppRole, 'TEACHER' as AppRole)
+  @Roles(Role.ADMIN, Role.TEACHER)
   @Put(':id')
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('file'))
@@ -72,10 +70,15 @@ export class CourseController {
     return this.courseService.update(id, dto, file, req.user.id);
   }
 
-  @Roles('ADMIN' as AppRole, 'TEACHER' as AppRole)
+  @Roles(Role.ADMIN, Role.TEACHER)
   @Delete(':id')
   remove(@Param('id') id: string, @Req() req) {
     return this.courseService.delete(id, req.user.id);
   }
 }
+
+
+
+
+
 

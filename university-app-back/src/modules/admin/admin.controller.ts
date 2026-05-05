@@ -1,27 +1,16 @@
-import {
-  Controller,
-  Post,
-  Body,
-  Get,
-  Param,
-  Delete,
-  Patch,
-  UseGuards,
-} from '@nestjs/common';
-import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { Role } from 'src/modules/users/dto/createUser.dto';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { Roles } from 'src/common/decorators/roles.decorator';
 import { AdminService } from './admin.service';
 import { CreateAdminDto } from './dto/createAdmin.dto';
 import { UpdateAdminDto } from './dto/updateAdmin.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
-import { Roles } from '../../common/decorators/roles.decorator';
-
-type AppRole = Parameters<typeof Roles>[number];
 
 @ApiTags('admins')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles('ADMIN' as AppRole)
+@Roles(Role.ADMIN)
 @Controller('admins')
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
@@ -51,3 +40,8 @@ export class AdminController {
     return this.adminService.remove(id);
   }
 }
+
+
+
+
+

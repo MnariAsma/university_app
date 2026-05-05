@@ -1,24 +1,6 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Delete,
-  Body,
-  Patch,
-  Param,
-  UseInterceptors,
-  UploadedFile,
-  Req,
-} from '@nestjs/common';
-import { RequestsService } from './requests.service';
-import { CreateRequestDto } from './dto/create-request.dto';
-import { UpdateRequestStatusDto } from './dto/update-request.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiTags, ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
-
+import { Role } from 'src/modules/users/dto/createUser.dto';
 import { Roles } from 'src/common/decorators/roles.decorator';
-
-type AppRole = Parameters<typeof Roles>[number];
+import { Roles } from 'src/common/decorators/roles.decorator';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import * as crypto from 'crypto';
@@ -41,7 +23,7 @@ const multerOptions = {
 export class RequestsController {
   constructor(private readonly requestsService: RequestsService) {}
 
-  @Roles('STUDENT' as AppRole)
+  @Roles(Role.STUDENT)
   @Post('requests')
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('file', multerOptions))
@@ -53,19 +35,19 @@ export class RequestsController {
     return this.requestsService.create(req.user.id, createRequestDto, file);
   }
 
-  @Roles('STUDENT' as AppRole)
+  @Roles(Role.STUDENT)
   @Get('requests/my-requests')
   findMyRequests(@Req() req) {
     return this.requestsService.findMyRequests(req.user.id);
   }
 
-  @Roles('ADMIN' as AppRole)
+  @Roles(Role.ADMIN)
   @Get('requests')
   findAll() {
     return this.requestsService.findAll();
   }
 
-  @Roles('ADMIN' as AppRole)
+  @Roles(Role.ADMIN)
   @Patch('requests/:id/status')
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('file', multerOptions))
@@ -77,18 +59,23 @@ export class RequestsController {
     return this.requestsService.updateStatus(id, updateRequestStatusDto, file);
   }
 
-  @Roles('STUDENT' as AppRole)
+  @Roles(Role.STUDENT)
   @Delete('requests/:id')
   deleteRequest(@Param('id') id: string, @Req() req) {
     return this.requestsService.deleteRequest(id, req.user.id);
   }
 
-  @Roles('STUDENT' as AppRole, 'ADMIN' as AppRole, 'TEACHER' as AppRole)
+  @Roles(Role.STUDENT, Role.ADMIN, Role.TEACHER)
   @Get('academic-years')
   getAcademicYears() {
     return this.requestsService.getAcademicYears();
   }
 }
+
+
+
+
+
 
 
 

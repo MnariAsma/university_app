@@ -1,12 +1,6 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
-import { GroupService } from './group.service';
-import { CreateGroupDto } from './dto/createGroup.dto';
-import { UpdateGroupDto } from './dto/updateGroup.dto';
-import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-
+import { Role } from 'src/modules/users/dto/createUser.dto';
 import { Roles } from 'src/common/decorators/roles.decorator';
-
-type AppRole = Parameters<typeof Roles>[number];
+import { Roles } from 'src/common/decorators/roles.decorator';
 
 @ApiTags('Groups')
 @ApiBearerAuth()
@@ -14,41 +8,46 @@ type AppRole = Parameters<typeof Roles>[number];
 export class GroupController {
   constructor(private readonly groupService: GroupService) {}
 
-  @Roles('ADMIN' as AppRole)
+  @Roles(Role.ADMIN)
   @Post()
   @ApiOperation({ summary: 'Create a new group' })
   create(@Body() createGroupDto: CreateGroupDto) {
     return this.groupService.create(createGroupDto);
   }
 
-  @Roles('ADMIN' as AppRole)
+  @Roles(Role.ADMIN)
   @Get()
   @ApiOperation({ summary: 'Get all groups' })
   findAll() {
     return this.groupService.findAll();
   }
 
-  @Roles('ADMIN' as AppRole)
+  @Roles(Role.ADMIN)
   @Get(':id')
   @ApiOperation({ summary: 'Get a group by id' })
   findOne(@Param('id') id: string) {
     return this.groupService.findOne(id);
   }
 
-  @Roles('ADMIN' as AppRole)
+  @Roles(Role.ADMIN)
   @Patch(':id')
   @ApiOperation({ summary: 'Update a group' })
   update(@Param('id') id: string, @Body() updateGroupDto: UpdateGroupDto) {
     return this.groupService.update(id, updateGroupDto);
   }
 
-  @Roles('ADMIN' as AppRole)
+  @Roles(Role.ADMIN)
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a group' })
   remove(@Param('id') id: string) {
     return this.groupService.remove(id);
   }
 }
+
+
+
+
+
 
 
 

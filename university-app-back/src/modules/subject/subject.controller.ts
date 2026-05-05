@@ -1,12 +1,6 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { SubjectService } from './subject.service';
-import { CreateSubjectDto } from './dto/createSubject.dto';
-import { UpdateSubjectDto } from './dto/updateSubject.dto';
-import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
-
+import { Role } from 'src/modules/users/dto/createUser.dto';
 import { Roles } from 'src/common/decorators/roles.decorator';
-
-type AppRole = Parameters<typeof Roles>[number];
+import { Roles } from 'src/common/decorators/roles.decorator';
 
 @ApiTags('subjects')
 @ApiBearerAuth()
@@ -14,36 +8,41 @@ type AppRole = Parameters<typeof Roles>[number];
 export class SubjectController {
   constructor(private readonly subjectService: SubjectService) {}
 
-  @Roles('ADMIN' as AppRole)
+  @Roles(Role.ADMIN)
   @Post()
   create(@Body() createSubjectDto: CreateSubjectDto) {
     return this.subjectService.create(createSubjectDto);
   }
 
-  @Roles('ADMIN' as AppRole)
+  @Roles(Role.ADMIN)
   @Get()
   findAll() {
     return this.subjectService.findAll();
   }
 
-  @Roles('ADMIN' as AppRole)
+  @Roles(Role.ADMIN)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.subjectService.findOne(id);
   }
 
-  @Roles('ADMIN' as AppRole)
+  @Roles(Role.ADMIN)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateSubjectDto: UpdateSubjectDto) {
     return this.subjectService.update(id, updateSubjectDto);
   }
 
-  @Roles('ADMIN' as AppRole)
+  @Roles(Role.ADMIN)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.subjectService.remove(id);
   }
 }
+
+
+
+
+
 
 
 

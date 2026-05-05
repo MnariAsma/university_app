@@ -35,3 +35,4 @@ export class DepartmentController {
     return this.departmentService.remove(id);
   }
 }
+
