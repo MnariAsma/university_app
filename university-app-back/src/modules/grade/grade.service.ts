@@ -195,4 +195,32 @@ async upsertGrades(dto: CreateGradesDto, userId: string) {
 
     return Array.from(combosMap.values());
   }
+
+  async findStudentGrades(userId: string) {
+    const student = await this.prisma.student.findUnique({
+      where: { userId },
+    });
+
+    if (!student) {
+      throw new NotFoundException('Student profile not found');
+    }
+
+    return this.prisma.grade.findMany({
+      where: { studentId: student.id },
+      include: {
+        subject: true,
+        academicYear: true,
+        teacher: {
+          include: {
+            user: { select: { firstName: true, lastName: true } }
+          }
+        }
+      },
+      orderBy: [
+        { academicYear: { startDate: 'desc' } },
+        { subject: { name: 'asc' } },
+        { evaluationType: 'asc' }
+      ]
+    });
+  }
 }

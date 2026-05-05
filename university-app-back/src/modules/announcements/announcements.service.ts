@@ -126,4 +126,78 @@ export class AnnouncementsService {
       orderBy: { createdAt: 'desc' },
     });
   }
+
+  async findAllForStudent(userId: string) {
+    const student = await this.prisma.student.findUnique({
+      where: { userId },
+      include: { group: true },
+    });
+
+    if (!student) {
+      throw new NotFoundException('Student profile not found');
+    }
+
+    // 1. Fetch Teacher Announcements targeting this student's program/level or global (null)
+    // Wait, earlier the logic for targeted announcements was:
+    // It targets specific program/level. If not provided, it targets all students of the teacher.
+    // For simplicity from student perspective: get announcements where targetProgramId is null or student.programId
+    // AND targetLevelId is null or student.group.levelId
+    const teacherAnnouncements = await this.prisma.announcement.findMany({
+      where: {
+        OR: [
+          { targetProgramId: null, targetLevelId: null },
+          { targetProgramId: student.programId, targetLevelId: null },
+          { targetProgramId: student.programId, targetLevelId: student.group?.levelId },
+        ],
+      },
+      include: {
+        teacher: {
+          include: { user: true },
+        },
+      },
+    });
+
+    // 2. Fetch Administration News
+    const adminNews = await this.prisma.news.findMany({
+      where: {
+        published: true,
+        OR: [
+          { programId: null },
+          { programId: student.programId },
+        ],
+      },
+      include: {
+        admin: {
+          include: { user: true },
+        },
+      },
+    });
+
+    // 3. Map to common format
+    const combined = [
+      ...teacherAnnouncements.map(a => ({
+        id: a.id,
+        title: a.title,
+        content: a.content,
+        type: a.type,
+        source: 'TEACHER',
+        author: `${a.teacher.user.firstName} ${a.teacher.user.lastName}`,
+        createdAt: a.createdAt,
+      })),
+      ...adminNews.map(n => ({
+        id: n.id,
+        title: n.title,
+        content: n.content,
+        type: 'INFO',
+        source: 'ADMIN',
+        author: `${n.admin.user.firstName} ${n.admin.user.lastName}`,
+        createdAt: n.createdAt,
+      }))
+    ];
+
+    // Sort descending by date
+    combined.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+
+    return combined;
+  }
 }

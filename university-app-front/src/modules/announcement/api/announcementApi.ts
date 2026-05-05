@@ -39,6 +39,10 @@ export const announcementApi = createApi({
       query: () => "/announcements",
       providesTags: ["Announcements"],
     }),
+    getStudentAnnouncements: builder.query<any[], void>({
+      query: () => "/announcements/student",
+      providesTags: ["Announcements"],
+    }),
     createAnnouncement: builder.mutation<Announcement, CreateAnnouncementRequest>({
       query: (body) => ({
         url: "/announcements",
@@ -50,4 +54,4 @@ export const announcementApi = createApi({
   }),
 });
 
-export const { useGetAnnouncementsQuery, useCreateAnnouncementMutation } = announcementApi;
+export const { useGetAnnouncementsQuery, useGetStudentAnnouncementsQuery, useCreateAnnouncementMutation } = announcementApi;

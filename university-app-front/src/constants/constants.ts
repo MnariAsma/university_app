@@ -12,6 +12,11 @@ export const MENU_TEXT = {
   grades: "Grades",
   profile: "Profile",
   presence: "Presence",
+  requests: "Requests",
+  Courses:"Courses",
+  Grades:"Grades",
+  Timetable:"Timetable",
+  Announcements:"Announcements",
 };
 export const LOGOUT= {
     loginTitle: "Logout",

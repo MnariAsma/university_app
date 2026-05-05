@@ -56,19 +56,31 @@ async create(
   }
 
 
-  async findForStudent(programId: string, semester: number) {
+  async findForStudent(userId: string) {
+    const student = await this.prisma.student.findUnique({
+      where: { userId },
+    });
+
+    if (!student) {
+      throw new ForbiddenException('Student profile not found');
+    }
+
     return this.prisma.course.findMany({
       where: {
         published: true,
         subject: {
-          programId,
-          semester,
+          programId: student.programId,
         },
       },
       include: {
         subject: true,
-        teacher: true,
+        teacher: {
+          include: {
+            user: { select: { firstName: true, lastName: true } }
+          }
+        },
       },
+      orderBy: { createdAt: 'desc' }
     });
   }
 

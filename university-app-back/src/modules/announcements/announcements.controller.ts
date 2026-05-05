@@ -23,6 +23,12 @@ export class AnnouncementsController {
   findAll(@Req() req) {
     return this.announcementsService.findAllByTeacher(req.user.id);
   }
+
+  @Roles(Role.STUDENT)
+  @Get('student')
+  findAllForStudent(@Req() req) {
+    return this.announcementsService.findAllForStudent(req.user.id);
+  }
 }
 
 

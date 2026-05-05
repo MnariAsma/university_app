@@ -67,6 +67,12 @@ export class GradeController {
   async save(@Body() dto: CreateGradesDto, @Req() req) {
     return this.gradeService.upsertGrades(dto, req.user.id);
   }
+
+  @Roles(Role.STUDENT)
+  @Get('my-grades')
+  async myGrades(@Req() req) {
+    return this.gradeService.findStudentGrades(req.user.id);
+  }
 }
 
 

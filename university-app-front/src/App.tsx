@@ -21,6 +21,7 @@ import CoursesPage from "./pages/CoursesPage/CoursesPage";
 import PresencePage from "./pages/PresencePage/PresencePage";
 import TimetablePage from "./pages/TimetablePage/TimetablePage";
 import NotFoundPage from "./pages/NotFoundPage/NotFoundPage";
+import AnnouncementsPage from "./pages/AnnouncementsPage/AnnouncementsPage";
 import AppLayout from "./Components/layout/AppLayout";
 import AnnouncementDashboard from "./modules/announcement/Components/AnnouncementDashboard";
 import RequestsPage from "./pages/RequestsPage/RequestsPage";
@@ -44,22 +45,6 @@ function App() {
             }
           />
           <Route
-            path={GRADES}
-            element={
-              <AppLayout>
-                <GradesPage />
-              </AppLayout>
-            }
-          />
-          <Route
-            path={COURSES}
-            element={
-              <AppLayout>
-                <CoursesPage />
-              </AppLayout>
-            }
-          />
-          <Route
             path={PRESENCE}
             element={
               <AppLayout>
@@ -67,14 +52,7 @@ function App() {
               </AppLayout>
             }
           />
-          <Route
-            path={ANNOUNCEMENTS}
-            element={
-              <AppLayout>
-                <AnnouncementDashboard />
-              </AppLayout>
-            }
-          />
+
         </Route>
 
         <Route element={<ProtectedRoute allowedRoles={[ROLES.TEACHER, ROLES.STUDENT]} />}>
@@ -95,6 +73,34 @@ function App() {
             element={
               <AppLayout>
                 <RequestsPage />
+              </AppLayout>
+            }
+          />
+        </Route>
+
+        {/* Shared routes for Teacher and Student */}
+        <Route element={<ProtectedRoute allowedRoles={[ROLES.TEACHER, ROLES.STUDENT]} />}>
+          <Route
+            path={COURSES}
+            element={
+              <AppLayout>
+                <CoursesPage />
+              </AppLayout>
+            }
+          />
+          <Route
+            path={GRADES}
+            element={
+              <AppLayout>
+                <GradesPage />
+              </AppLayout>
+            }
+          />
+          <Route
+            path={ANNOUNCEMENTS}
+            element={
+              <AppLayout>
+                <AnnouncementsPage />
               </AppLayout>
             }
           />

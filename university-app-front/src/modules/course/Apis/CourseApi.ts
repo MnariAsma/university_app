@@ -19,6 +19,10 @@ export const courseApi = createApi({
       query: () => "/courses/teacher",
       providesTags: ["Courses"],
     }),
+    getStudentCourses: builder.query<any[], void>({
+      query: () => "/courses/student",
+      providesTags: ["Courses"],
+    }),
     addCourse: builder.mutation<any, FormData>({
       query: (payload) => ({
         url: "/courses",
@@ -32,5 +36,6 @@ export const courseApi = createApi({
 
 export const {
   useGetTeacherCoursesQuery,
+  useGetStudentCoursesQuery,
   useAddCourseMutation,
 } = courseApi;

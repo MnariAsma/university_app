@@ -56,10 +56,7 @@ export class CourseController {
   @Roles('ADMIN' as AppRole, 'STUDENT' as AppRole)
   @Get('student')
   findForStudent(@Req() req) {
-    return this.courseService.findForStudent(
-      req.user.programId,
-      req.user.semester,
-    );
+    return this.courseService.findForStudent(req.user.id);
   }
 
   @Roles('ADMIN' as AppRole, 'TEACHER' as AppRole)
@@ -81,6 +78,4 @@ export class CourseController {
     return this.courseService.delete(id, req.user.id);
   }
 }
-
-
 
