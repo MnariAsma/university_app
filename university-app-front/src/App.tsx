@@ -44,15 +44,6 @@ function App() {
               </AppLayout>
             }
           />
-          <Route
-            path={PRESENCE}
-            element={
-              <AppLayout>
-                <PresencePage />
-              </AppLayout>
-            }
-          />
-
         </Route>
 
         <Route element={<ProtectedRoute allowedRoles={[ROLES.TEACHER, ROLES.STUDENT]} />}>
@@ -101,6 +92,14 @@ function App() {
             element={
               <AppLayout>
                 <AnnouncementsPage />
+              </AppLayout>
+            }
+          />
+          <Route
+            path={PRESENCE}
+            element={
+              <AppLayout>
+                <PresencePage />
               </AppLayout>
             }
           />
