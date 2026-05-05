@@ -54,14 +54,6 @@ function App() {
             }
           />
           <Route
-            path={COURSES}
-            element={
-              <AppLayout>
-                <CoursesPage />
-              </AppLayout>
-            }
-          />
-          <Route
             path={PRESENCE}
             element={
               <AppLayout>
@@ -94,6 +86,18 @@ function App() {
             element={
               <AppLayout>
                 <TimetablePage />
+              </AppLayout>
+            }
+          />
+        </Route>
+
+        {/* Shared routes for Teacher and Student */}
+        <Route element={<ProtectedRoute allowedRoles={[ROLES.TEACHER, ROLES.STUDENT]} />}>
+          <Route
+            path={COURSES}
+            element={
+              <AppLayout>
+                <CoursesPage />
               </AppLayout>
             }
           />

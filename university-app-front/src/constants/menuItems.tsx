@@ -54,6 +54,7 @@ export const menuItemsTeacher = [
 
 export const menuItemsUser = [
   { text: MENU_TEXT.dashboard, icon: <DashboardIcon />, path: USER_DASHBOARD },
+  { text: "Courses", icon: <EventNote />, path: COURSES },
   { text: "Requests", icon: <DescriptionIcon />, path: REQUESTS },
   { text: MENU_TEXT.reservations, icon: <CalendarMonth />, path: MY_RESERVATIONS },
   { text: MENU_TEXT.profile, icon: <Person />, path: PROFILE },

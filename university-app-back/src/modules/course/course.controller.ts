@@ -51,13 +51,10 @@ export class CourseController {
     return this.courseService.findAllByTeacher(req.user.id);
   }
 
-  @Roles(Role.ADMIN, Role.STUDENT)
+  @Roles(Role.STUDENT)
   @Get('student')
   findForStudent(@Req() req) {
-    return this.courseService.findForStudent(
-      req.user.programId,
-      req.user.semester,
-    );
+    return this.courseService.findForStudent(req.user.id);
   }
 
   @Roles(Role.ADMIN, Role.TEACHER)

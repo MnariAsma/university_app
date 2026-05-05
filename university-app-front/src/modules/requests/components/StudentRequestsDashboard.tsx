@@ -591,7 +591,7 @@ export default function StudentRequestsDashboard() {
                     (typeof CATEGORY_INFO)["INTERNSHIP"],
                   ][]
                 ).map(([key, info]) => (
-                    <Grid item xs={12} key={key}>
+                    <Grid size={{ xs: 12 }} key={key}>
                     <Card
                       onClick={() => handleCategorySelect(key)}
                       elevation={0}
@@ -664,7 +664,7 @@ export default function StudentRequestsDashboard() {
               </Typography>
               <Grid container spacing={2}>
                 {CATEGORY_INFO[selectedCategory].types.map((t) => (
-                  <Grid item xs={12} key={t.value}>
+                  <Grid size={{ xs: 12 }} key={t.value}>
                     <Card
                       onClick={() => {
                         setSelectedType(t.value);
