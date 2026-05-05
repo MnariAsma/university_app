@@ -22,6 +22,19 @@
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": false,
     "strictBindCallApply": false,
-    "noFallthroughCasesInSwitch": false
-  }
+    "noFallthroughCasesInSwitch": false,
+    "types": ["jest", "node"],
+    "rootDir": "."
+  },
+  "jest": {
+    "moduleNameMapper": {
+      "^src/(.*)$": "<rootDir>/src/$1"
+    }
+  },
+  "include": [
+    "src",
+    "check.ts",
+    "prisma.config.ts",
+    "prisma/seed.ts"
+  ]
 }

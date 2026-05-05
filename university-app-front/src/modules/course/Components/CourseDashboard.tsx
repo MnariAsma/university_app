@@ -29,6 +29,7 @@ import {
   Close,
   Description,
   CalendarToday,
+  Delete,
 } from "@mui/icons-material";
 import {
   useGetTeacherSubjectsQuery,
@@ -36,6 +37,7 @@ import {
 import {
   useGetTeacherCoursesQuery,
   useAddCourseMutation,
+  useDeleteCourseMutation,
 } from "../Apis/CourseApi";
 import { useAppDispatch } from "../../../hooks/reduxHooks";
 import { addToast } from "../../../slices/toast/toastSlice";
@@ -61,6 +63,17 @@ const CourseDashboard = () => {
   const { data: courses = [], isLoading: isLoadingCourses } =
     useGetTeacherCoursesQuery();
   const [addCourse, { isLoading: isAdding }] = useAddCourseMutation();
+  const [deleteCourse] = useDeleteCourseMutation();
+
+  const handleDeleteCourse = async (id: string, title: string) => {
+    if (!window.confirm(`Delete "${title}"?`)) return;
+    try {
+      await deleteCourse(id).unwrap();
+      dispatch(addToast({ message: 'Course deleted', type: 'success' }));
+    } catch {
+      dispatch(addToast({ message: 'Failed to delete course', type: 'error' }));
+    }
+  };
 
   // Auto-select first subject on load
   useEffect(() => {
@@ -614,6 +627,25 @@ const CourseDashboard = () => {
                         </Box>
                       </>
                     )}
+                    <Divider />
+                    <Box sx={{ p: 1.5 }}>
+                      <Button
+                        fullWidth
+                        size="small"
+                        startIcon={<Delete />}
+                        onClick={() => handleDeleteCourse(course.id, course.title)}
+                        sx={{
+                          textTransform: "none",
+                          borderRadius: 2,
+                          fontWeight: 600,
+                          color: "error.main",
+                          bgcolor: isDark ? "rgba(239,68,68,0.08)" : "rgba(239,68,68,0.06)",
+                          "&:hover": { bgcolor: isDark ? "rgba(239,68,68,0.16)" : "rgba(239,68,68,0.12)" },
+                        }}
+                      >
+                        Delete
+                      </Button>
+                    </Box>
                   </Card>
                 </Grid>
               ))}

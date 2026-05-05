@@ -1,6 +1,15 @@
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from 'src/modules/users/dto/createUser.dto';
-import { Roles } from 'src/common/decorators/roles.decorator';
-import { Roles } from 'src/common/decorators/roles.decorator';
 import { StudentService } from './student.service';
 import { CreateStudentDto } from './dto/createStudent.dto';
 import { UpdateStudentDto } from './dto/updateStudent.dto';

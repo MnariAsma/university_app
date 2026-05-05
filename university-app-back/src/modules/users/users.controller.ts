@@ -1,6 +1,18 @@
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from 'src/modules/users/dto/createUser.dto';
-import { Roles } from 'src/common/decorators/roles.decorator';
-import { Roles } from 'src/common/decorators/roles.decorator';
+import { UserService } from './users.service';
+import { CreateUserDto } from './dto/createUser.dto';
+import { UpdateUserDto } from './dto/updateUser.dto';
 
 @ApiBearerAuth()
 @Controller('users')

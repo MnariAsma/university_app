@@ -4,6 +4,7 @@ import { CourseController } from './course.controller';
 import { PrismaService } from 'src/common/prisma.service';
 import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
+import { CourseAiModule } from './course-ai/course-ai.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { diskStorage } from 'multer';
         },
       }),
     }),
+    CourseAiModule,
   ],
   controllers: [CourseController],
   providers: [CourseService, PrismaService],

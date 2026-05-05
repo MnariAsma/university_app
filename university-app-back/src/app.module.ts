@@ -30,6 +30,7 @@ import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './common/guards/roles.guard';
 import { AiModule } from './ai/ai.module';
+import {CourseAiModule} from "./modules/course/course-ai/course-ai.module";
 
 @Module({
   imports: [
@@ -58,6 +59,8 @@ import { AiModule } from './ai/ai.module';
     RequestsModule,
     AppCacheModule,
     AiModule,
+    CourseAiModule,
+
   ],
   controllers: [AppController],
   providers: [

@@ -1,6 +1,18 @@
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from 'src/modules/users/dto/createUser.dto';
-import { Roles } from 'src/common/decorators/roles.decorator';
-import { Roles } from 'src/common/decorators/roles.decorator';
+import { LevelService } from './level.service';
+import { CreateLevelDto } from './dto/createLevel.dto';
+import { UpdateLevelDto } from './dto/updateLevel.dto';
 
 @ApiTags('Levels')
 @ApiBearerAuth()

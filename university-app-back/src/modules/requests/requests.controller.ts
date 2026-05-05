@@ -1,9 +1,25 @@
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Req,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiBearerAuth, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from 'src/modules/users/dto/createUser.dto';
-import { Roles } from 'src/common/decorators/roles.decorator';
-import { Roles } from 'src/common/decorators/roles.decorator';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import * as crypto from 'crypto';
+import { RequestsService } from './requests.service';
+import { CreateRequestDto } from './dto/create-request.dto';
+import { UpdateRequestStatusDto } from './dto/update-request.dto';
 
 const multerOptions = {
   storage: diskStorage({
