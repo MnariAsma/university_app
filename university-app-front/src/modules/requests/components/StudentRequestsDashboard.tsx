@@ -247,7 +247,7 @@ export default function StudentRequestsDashboard() {
           <Typography
             variant="h4"
             sx={{
-              fontWeight: 800,
+              fontWeight: 750,
               background: "linear-gradient(135deg, #ffffffff, #eaeaeaff)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",

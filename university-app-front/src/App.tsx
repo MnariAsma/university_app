@@ -46,14 +46,6 @@ function App() {
             }
           />
           <Route
-            path={GRADES}
-            element={
-              <AppLayout>
-                <GradesPage />
-              </AppLayout>
-            }
-          />
-          <Route
             path={PRESENCE}
             element={
               <AppLayout>
@@ -98,6 +90,14 @@ function App() {
             element={
               <AppLayout>
                 <CoursesPage />
+              </AppLayout>
+            }
+          />
+          <Route
+            path={GRADES}
+            element={
+              <AppLayout>
+                <GradesPage />
               </AppLayout>
             }
           />

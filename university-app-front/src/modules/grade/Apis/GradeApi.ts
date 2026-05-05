@@ -45,6 +45,11 @@ export const gradeApi = createApi({
       providesTags: ["Students"],
     }),
 
+    getStudentGrades: builder.query<any[], void>({
+      query: () => "/grades/my-grades",
+      providesTags: ["Grades"],
+    }),
+
     saveGrades: builder.mutation<any, any>({
       query: (payload) => ({
         url: "/grades",
@@ -62,5 +67,6 @@ export const {
   useGetProgramsQuery,
   useGetLevelsQuery,
   useGetStudentsQuery,
+  useGetStudentGradesQuery,
   useSaveGradesMutation,
 } = gradeApi;
