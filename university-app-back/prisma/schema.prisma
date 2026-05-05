@@ -39,16 +39,17 @@ model Admin {
 }
 
 model AcademicYear {
-  id              String           @id @default(cuid())
-  label           String           @unique
-  startDate       DateTime
-  endDate         DateTime
-  active          Boolean          @default(false)
-  createdAt       DateTime         @default(now())
-  exams           Exam[]
-  grades          Grade[]
-  students        Student[]
-  teacherSubjects TeacherSubject[]
+  id               String            @id @default(cuid())
+  label            String            @unique
+  startDate        DateTime
+  endDate          DateTime
+  active           Boolean           @default(false)
+  createdAt        DateTime          @default(now())
+  exams            Exam[]
+  grades           Grade[]
+  students         Student[]
+  teacherSubjects  TeacherSubject[]
+  documentRequests DocumentRequest[]
 
   @@map("academic_years")
 }
@@ -70,47 +71,55 @@ model Department {
 
 //filiere
 model Program {
-  id              String           @id @default(cuid())
-  name            String
-  code            String           @unique
-  description     String?
-  level           String
-  departmentId    String
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-  exams           Exam[]
+  id           String     @id @default(cuid())
+  name         String
+  code         String     @unique
+  description  String?
+  level        String
+  departmentId String
+  department   Department @relation(fields: [departmentId], references: [id])
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
   levels          Level[]
-  news            News[]
-  department      Department       @relation(fields: [departmentId], references: [id])
-  students        Student[]
   subjects        Subject[]
+  students        Student[]
+  exams           Exam[]
+  news            News[]
   teacherSubjects TeacherSubject[]
+  announcements   Announcement[]
 
   @@map("programs")
 }
 
 model Level {
-  id              String           @id @default(cuid())
-  name            String
-  order           Int
-  programId       String
+  id    String @id @default(cuid())
+  name  String
+  order Int
+
+  programId String
+  program   Program @relation(fields: [programId], references: [id])
+
   groups          Group[]
-  program         Program          @relation(fields: [programId], references: [id])
   teacherSubjects TeacherSubject[]
+  announcements   Announcement[]
 
   @@map("levels")
 }
 
 model Group {
-  id        String    @id @default(cuid())
-  name      String
-  code      String    @unique
-  levelId   String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  level     Level     @relation(fields: [levelId], references: [id])
-  sessions  Session[]
-  students  Student[]
+  id   String @id @default(cuid())
+  name String
+  code String @unique
+
+  levelId String
+  level   Level  @relation(fields: [levelId], references: [id])
+
+  students Student[]
+  sessions Session[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("groups")
 }
@@ -134,26 +143,29 @@ model Student {
   group          Group              @relation(fields: [groupId], references: [id])
   program        Program            @relation(fields: [programId], references: [id])
   user           User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  documentRequests DocumentRequest[]
 
   @@map("students")
 }
 
 model Teacher {
-  id           String           @id @default(cuid())
-  matricule    String           @unique
-  userId       String           @unique
+  id           String     @id @default(cuid())
+  matricule    String     @unique
+  userId       String     @unique
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   departmentId String
+  department   Department @relation(fields: [departmentId], references: [id])
   grade        String?
   specialty    String?
-  createdAt    DateTime         @default(now())
-  updatedAt    DateTime         @updatedAt
-  courses      Course[]
-  exams        Exam[]
-  grades       Grade[]
-  sessions     Session[]
-  subjectLinks TeacherSubject[]
-  department   Department       @relation(fields: [departmentId], references: [id])
-  user         User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  courses       Course[]
+  sessions      Session[]
+  subjectLinks  TeacherSubject[]
+  grades        Grade[]
+  exams         Exam[]
+  announcements Announcement[]
 
   @@map("teachers")
 }
@@ -249,7 +261,6 @@ model Session {
   room      Room?       @relation(fields: [roomId], references: [id])
   subject   Subject     @relation(fields: [subjectId], references: [id])
   teacher   Teacher     @relation(fields: [teacherId], references: [id])
-
   @@map("sessions")
 }
 
@@ -448,4 +459,71 @@ model StudentSubjectStatus {
 
   @@unique([studentId, subjectId])
   @@map("student_subject_status")
+}
+
+// ============================================================
+// ANNOUNCEMENTS
+// ============================================================
+
+model Announcement {
+  id      String @id @default(cuid())
+  title   String
+  content String
+  type    String @default("INFO")
+
+  teacherId String
+  teacher   Teacher @relation(fields: [teacherId], references: [id])
+
+  targetProgramId String?
+  program         Program? @relation(fields: [targetProgramId], references: [id])
+  targetLevelId   String?
+  level           Level?   @relation(fields: [targetLevelId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("announcements")
+}
+
+// ============================================================
+// DOCUMENT REQUESTS
+// ============================================================
+
+enum RequestCategory {
+  INTERNSHIP
+  UNIVERSITY
+}
+
+enum RequestType {
+  INTERNSHIP_DOC
+  CERTIFICATE_SUCCESS
+  CERTIFICATE_ATTENDANCE
+}
+
+enum RequestStatus {
+  PENDING
+  ACCEPTED
+  REFUSED
+}
+
+model DocumentRequest {
+  id             String          @id @default(cuid())
+  studentId      String
+  student        Student         @relation(fields: [studentId], references: [id])
+  category       RequestCategory
+  type           RequestType
+
+  academicYearId String?
+  academicYear   AcademicYear?   @relation(fields: [academicYearId], references: [id])
+  reason         String?
+
+  studentFileUrl String?
+  adminFileUrl   String?
+
+  status         RequestStatus   @default(PENDING)
+
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  @@map("document_requests")
 }

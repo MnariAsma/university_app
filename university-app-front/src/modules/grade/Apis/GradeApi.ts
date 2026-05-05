@@ -26,6 +26,14 @@ export const gradeApi = createApi({
       providesTags: ["Placements"],
     }),
 
+    getPrograms: builder.query<any[], void>({
+      query: () => "/grades/programs",
+    }),
+
+    getLevels: builder.query<any[], string>({
+      query: (programId) => `/grades/levels?programId=${programId}`,
+    }),
+
     getStudents: builder.query<any[], { programId: string; levelId: string; subjectId?: string; evaluationType?: string; semester?: number }>({
       query: ({ programId, levelId, subjectId, evaluationType, semester }) => {
         let url = `/grades/students?programId=${programId}&levelId=${levelId}`;
@@ -51,6 +59,8 @@ export const gradeApi = createApi({
 export const {
   useGetTeacherSubjectsQuery,
   useGetPlacementsQuery,
+  useGetProgramsQuery,
+  useGetLevelsQuery,
   useGetStudentsQuery,
   useSaveGradesMutation,
 } = gradeApi;

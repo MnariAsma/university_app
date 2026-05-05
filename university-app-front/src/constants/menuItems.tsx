@@ -7,7 +7,9 @@ import {
   Grade as GradeIcon,
   HowToReg,
   CalendarViewWeek,
+  Description as DescriptionIcon,
 } from "@mui/icons-material";
+
 import {
   DASHBOARD,
   MEETING_ROOM,
@@ -19,8 +21,12 @@ import {
   GRADES,
   COURSES,
   PRESENCE,
-  TIMETABLE, // ← new
+  TIMETABLE, 
+  ANNOUNCEMENTS,
+  REQUESTS,
+
 } from "../routes/routes";
+
 import { MENU_TEXT } from "./constants";
 
 export const menuItemsAdmin = [
@@ -34,14 +40,21 @@ export const menuItemsAdmin = [
 export const menuItemsTeacher = [
   { text: MENU_TEXT.dashboard, icon: <DashboardIcon />, path: DASHBOARD },
   { text: MENU_TEXT.grades, icon: <GradeIcon />, path: GRADES },
+
   { text: "Cours", icon: <EventNote />, path: COURSES },
   { text: MENU_TEXT.presence, icon: <HowToReg />, path: PRESENCE },  
-    { text: "Timetable", icon: <CalendarViewWeek />, path: TIMETABLE },// ← new
+  { text: "Timetable", icon: <CalendarViewWeek />, path: TIMETABLE },
+  { text: "Courses", icon: <EventNote />, path: COURSES },
+
+  { text: MENU_TEXT.presence, icon: <HowToReg />, path: PRESENCE },
+
+  { text: "Announcements", icon: <EventNote />, path: ANNOUNCEMENTS },
   { text: MENU_TEXT.profile, icon: <Person />, path: PROFILE },
 ];
 
 export const menuItemsUser = [
   { text: MENU_TEXT.dashboard, icon: <DashboardIcon />, path: USER_DASHBOARD },
+  { text: "Requests", icon: <DescriptionIcon />, path: REQUESTS },
   { text: MENU_TEXT.reservations, icon: <CalendarMonth />, path: MY_RESERVATIONS },
   { text: MENU_TEXT.profile, icon: <Person />, path: PROFILE },
 ];
