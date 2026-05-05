@@ -113,7 +113,7 @@ const Sidebar = () => {
   <SidebarAvatarUser>
     {user?.image ? (
       <img
-        src={`http://localhost:3333/uploads/${user.image}`}
+        src={`http://localhost:3000/uploads/${user.image}`}
         alt="user"
         style={{
           width: "100%",

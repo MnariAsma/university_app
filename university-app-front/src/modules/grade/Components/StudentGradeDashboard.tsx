@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import {
   Box,
   Typography,
@@ -13,7 +13,7 @@ import {
   useTheme,
   CircularProgress,
 } from "@mui/material";
-import { Grade as GradeIcon, Description } from "@mui/icons-material";
+import { Description } from "@mui/icons-material";
 import { useGetStudentGradesQuery } from "../Apis/GradeApi";
 
 const StudentGradeDashboard = () => {

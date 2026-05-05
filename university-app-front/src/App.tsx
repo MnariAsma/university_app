@@ -23,7 +23,6 @@ import TimetablePage from "./pages/TimetablePage/TimetablePage";
 import NotFoundPage from "./pages/NotFoundPage/NotFoundPage";
 import AnnouncementsPage from "./pages/AnnouncementsPage/AnnouncementsPage";
 import AppLayout from "./Components/layout/AppLayout";
-import AnnouncementDashboard from "./modules/announcement/Components/AnnouncementDashboard";
 import RequestsPage from "./pages/RequestsPage/RequestsPage";
 
 function App() {

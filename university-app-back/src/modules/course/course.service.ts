@@ -3,9 +3,15 @@ import { PrismaService } from 'src/common/prisma.service';
 import { createCourseDto } from './dto/createCourse.dto';
 import { UpdateCourseDto } from './dto/updateCourse.dto';
 
+import { NotificationsService } from '../notifications/notifications.service';
+import { NotificationType } from '@prisma/client';
+
 @Injectable()
 export class CourseService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private notificationsService: NotificationsService,
+  ) {}
 
 async create(
   dto: createCourseDto,
@@ -22,7 +28,7 @@ async create(
     throw new Error("Teacher not found for this user");
   }
 
-  return this.prisma.course.create({
+  const course = await this.prisma.course.create({
     data: {
       title: dto.title,
       description: dto.description,
@@ -32,7 +38,32 @@ async create(
       fileUrl: file ? file.filename : null,
       type: dto.type,
     },
+    include: { subject: true },
   });
+
+  // Notify all students in this subject's program
+  const subject = await this.prisma.subject.findUnique({
+    where: { id: dto.subjectId },
+  });
+
+  if (subject && subject.programId) {
+    const students = await this.prisma.student.findMany({
+      where: { programId: subject.programId },
+      select: { userId: true }
+    });
+
+    for (const student of students) {
+      await this.notificationsService.createNotification({
+        userId: student.userId,
+        title: 'Nouveau Cours Ajouté',
+        message: `Le professeur a ajouté un nouveau cours : ${course.title} dans la matière ${subject.name}.`,
+        type: NotificationType.COURSE,
+        redirectLink: '/courses',
+      });
+    }
+  }
+
+  return course;
 }
 
   async findAllByTeacher(userId: string) {

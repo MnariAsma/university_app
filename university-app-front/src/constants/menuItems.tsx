@@ -39,7 +39,6 @@ export const menuItemsAdmin = [
 
 export const menuItemsTeacher = [
   { text: MENU_TEXT.dashboard, icon: <DashboardIcon />, path: DASHBOARD },
-  { text: "Cours", icon: <EventNote />, path: COURSES },
   { text: MENU_TEXT.grades, icon: <GradeIcon />, path: GRADES },
 
   { text: MENU_TEXT.presence, icon: <HowToReg />, path: PRESENCE },  

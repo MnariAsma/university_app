@@ -3,8 +3,9 @@ import {
   NotFoundException,
   ForbiddenException,
 } from '@nestjs/common';
-import { AbsenceStatus, Role, User } from '@prisma/client';
+import { AbsenceStatus, Role, User, NotificationType } from '@prisma/client';
 import { PrismaService } from 'src/common/prisma.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import { MarkAttendanceDto } from './dto/mark-attendance.dto';
 import { UpdateAbsenceDto } from './dto/update-absence.dto';
 import { AttendanceFilterDto } from './dto/attendance-filter.dto';
@@ -13,7 +14,10 @@ const ELIMINATION_THRESHOLD = 3;
 
 @Injectable()
 export class AbsenceService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private notificationsService: NotificationsService,
+  ) {}
 
   // ─── Helper: get Teacher record from User ──────────────────────────────────
   // session.teacherId = Teacher.id (not User.id)
@@ -244,6 +248,25 @@ export class AbsenceService {
         }),
       ),
     );
+
+    // Notify students marked as ABSENT
+    for (const entry of dto.attendances) {
+      if (entry.status === AbsenceStatus.ABSENT) {
+        const student = await this.prisma.student.findUnique({
+          where: { id: entry.studentId },
+          select: { userId: true },
+        });
+        if (student) {
+          await this.notificationsService.createNotification({
+            userId: student.userId,
+            title: 'Nouvelle Absence',
+            message: `Vous avez été marqué absent en session.`,
+            type: NotificationType.ABSENCE,
+            redirectLink: '/presence',
+          });
+        }
+      }
+    }
 
     // Recalculate elimination for each student that was submitted
     const uniqueStudentIds = [...new Set(dto.attendances.map((e) => e.studentId))];

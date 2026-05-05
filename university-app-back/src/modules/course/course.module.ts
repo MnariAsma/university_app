@@ -5,8 +5,11 @@ import { PrismaService } from 'src/common/prisma.service';
 import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 
+import { NotificationsModule } from '../notifications/notifications.module';
+
 @Module({
   imports: [
+    NotificationsModule,
     MulterModule.register({
       storage: diskStorage({
         destination: './uploads',
