@@ -15,8 +15,10 @@ import { CreateRequestDto } from './dto/create-request.dto';
 import { UpdateRequestStatusDto } from './dto/update-request.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
+
 import { Roles } from 'src/common/decorators/roles.decorator';
-import { Role } from '@prisma/client';
+
+type AppRole = Parameters<typeof Roles>[number];
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import * as crypto from 'crypto';
@@ -39,7 +41,7 @@ const multerOptions = {
 export class RequestsController {
   constructor(private readonly requestsService: RequestsService) {}
 
-  @Roles(Role.STUDENT)
+  @Roles('STUDENT' as AppRole)
   @Post('requests')
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('file', multerOptions))
@@ -51,19 +53,19 @@ export class RequestsController {
     return this.requestsService.create(req.user.id, createRequestDto, file);
   }
 
-  @Roles(Role.STUDENT)
+  @Roles('STUDENT' as AppRole)
   @Get('requests/my-requests')
   findMyRequests(@Req() req) {
     return this.requestsService.findMyRequests(req.user.id);
   }
 
-  @Roles(Role.ADMIN)
+  @Roles('ADMIN' as AppRole)
   @Get('requests')
   findAll() {
     return this.requestsService.findAll();
   }
 
-  @Roles(Role.ADMIN)
+  @Roles('ADMIN' as AppRole)
   @Patch('requests/:id/status')
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('file', multerOptions))
@@ -75,15 +77,18 @@ export class RequestsController {
     return this.requestsService.updateStatus(id, updateRequestStatusDto, file);
   }
 
-  @Roles(Role.STUDENT)
+  @Roles('STUDENT' as AppRole)
   @Delete('requests/:id')
   deleteRequest(@Param('id') id: string, @Req() req) {
     return this.requestsService.deleteRequest(id, req.user.id);
   }
 
-  @Roles(Role.STUDENT, Role.ADMIN, Role.TEACHER)
+  @Roles('STUDENT' as AppRole, 'ADMIN' as AppRole, 'TEACHER' as AppRole)
   @Get('academic-years')
   getAcademicYears() {
     return this.requestsService.getAcademicYears();
   }
 }
+
+
+

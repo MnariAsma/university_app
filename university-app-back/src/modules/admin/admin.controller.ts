@@ -15,12 +15,13 @@ import { UpdateAdminDto } from './dto/updateAdmin.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
-import { Role } from '../users/dto/createUser.dto';
+
+type AppRole = Parameters<typeof Roles>[number];
 
 @ApiTags('admins')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles(Role.ADMIN)
+@Roles('ADMIN' as AppRole)
 @Controller('admins')
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}

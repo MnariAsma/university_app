@@ -1,8 +1,10 @@
 import { Controller, Get, Req, Post, Body, Query } from '@nestjs/common';
 import { GradeService } from './grade.service';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+
 import { Roles } from 'src/common/decorators/roles.decorator';
-import { Role } from '@prisma/client';
+
+type AppRole = Parameters<typeof Roles>[number];
 import { CreateGradesDto } from './dto/create-grades.dto';
 
 @ApiTags('grades')
@@ -11,13 +13,13 @@ import { CreateGradesDto } from './dto/create-grades.dto';
 export class GradeController {
   constructor(private readonly gradeService: GradeService) {}
 
-  @Roles(Role.TEACHER, Role.ADMIN)
+  @Roles('TEACHER' as AppRole, 'ADMIN' as AppRole)
   @Get('subjects')
   async mySubjects(@Req() req) {
     return this.gradeService.findTeacherSubjects(req.user.id);
   }
 
-  @Roles(Role.TEACHER, Role.ADMIN)
+  @Roles('TEACHER' as AppRole, 'ADMIN' as AppRole)
   @Get('placements')
   async placements(@Req() req, @Query('subjectId') subjectId?: string) {
     if (!subjectId) {
@@ -26,13 +28,13 @@ export class GradeController {
     return this.gradeService.findProgramLevelCombos(req.user.id, subjectId);
   }
 
-  @Roles(Role.TEACHER, Role.ADMIN)
+  @Roles('TEACHER' as AppRole, 'ADMIN' as AppRole)
   @Get('programs')
   async programs(@Req() req, @Query('subjectId') subjectId?: string) {
     return this.gradeService.findPrograms(req.user.id, subjectId);
   }
 
-  @Roles(Role.TEACHER, Role.ADMIN)
+  @Roles('TEACHER' as AppRole, 'ADMIN' as AppRole)
   @Get('levels')
   async levels(
     @Req() req,
@@ -42,7 +44,7 @@ export class GradeController {
     return this.gradeService.findLevels(programId, req.user.id, subjectId);
   }
 
-  @Roles(Role.TEACHER, Role.ADMIN)
+  @Roles('TEACHER' as AppRole, 'ADMIN' as AppRole)
   @Get('students')
   async students(
     @Query('programId') programId: string,
@@ -60,9 +62,12 @@ export class GradeController {
     );
   }
 
-  @Roles(Role.TEACHER, Role.ADMIN)
+  @Roles('TEACHER' as AppRole, 'ADMIN' as AppRole)
   @Post()
   async save(@Body() dto: CreateGradesDto, @Req() req) {
     return this.gradeService.upsertGrades(dto, req.user.id);
   }
 }
+
+
+

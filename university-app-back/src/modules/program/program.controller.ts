@@ -3,8 +3,10 @@ import { ProgramService } from './program.service';
 import { CreateProgramDto } from './dto/createProgram.dto';
 import { UpdateProgramDto } from './dto/updateProgram.dto';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+
 import { Roles } from 'src/common/decorators/roles.decorator';
-import { Role } from '@prisma/client';
+
+type AppRole = Parameters<typeof Roles>[number];
 
 @ApiTags('programs')
 @ApiBearerAuth()
@@ -12,33 +14,36 @@ import { Role } from '@prisma/client';
 export class ProgramController {
   constructor(private readonly programService: ProgramService) {}
 
-  @Roles(Role.ADMIN)
+  @Roles('ADMIN' as AppRole)
   @Post()
   create(@Body() createProgramDto: CreateProgramDto) {
     return this.programService.create(createProgramDto);
   }
 
-  @Roles(Role.ADMIN)
+  @Roles('ADMIN' as AppRole)
   @Get()
   findAll() {
     return this.programService.findAll();
   }
 
-  @Roles(Role.ADMIN)
+  @Roles('ADMIN' as AppRole)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.programService.findOne(id);
   }
 
-  @Roles(Role.ADMIN)
+  @Roles('ADMIN' as AppRole)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateProgramDto: UpdateProgramDto) {
     return this.programService.update(id, updateProgramDto);
   }
 
-  @Roles(Role.ADMIN)
+  @Roles('ADMIN' as AppRole)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.programService.remove(id);
   }
 }
+
+
+

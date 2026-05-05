@@ -3,8 +3,10 @@ import { SubjectService } from './subject.service';
 import { CreateSubjectDto } from './dto/createSubject.dto';
 import { UpdateSubjectDto } from './dto/updateSubject.dto';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+
 import { Roles } from 'src/common/decorators/roles.decorator';
-import { Role } from '@prisma/client';
+
+type AppRole = Parameters<typeof Roles>[number];
 
 @ApiTags('subjects')
 @ApiBearerAuth()
@@ -12,33 +14,36 @@ import { Role } from '@prisma/client';
 export class SubjectController {
   constructor(private readonly subjectService: SubjectService) {}
 
-  @Roles(Role.ADMIN)
+  @Roles('ADMIN' as AppRole)
   @Post()
   create(@Body() createSubjectDto: CreateSubjectDto) {
     return this.subjectService.create(createSubjectDto);
   }
 
-  @Roles(Role.ADMIN)
+  @Roles('ADMIN' as AppRole)
   @Get()
   findAll() {
     return this.subjectService.findAll();
   }
 
-  @Roles(Role.ADMIN)
+  @Roles('ADMIN' as AppRole)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.subjectService.findOne(id);
   }
 
-  @Roles(Role.ADMIN)
+  @Roles('ADMIN' as AppRole)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateSubjectDto: UpdateSubjectDto) {
     return this.subjectService.update(id, updateSubjectDto);
   }
 
-  @Roles(Role.ADMIN)
+  @Roles('ADMIN' as AppRole)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.subjectService.remove(id);
   }
 }
+
+
+

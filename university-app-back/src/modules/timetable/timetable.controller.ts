@@ -1,9 +1,10 @@
 import { Controller, Get, Param, Query, Request } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiQuery, ApiTags,ApiBearerAuth } from '@nestjs/swagger';
-import { Role } from '@prisma/client';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { TimetableQueryDto } from './dto/timetable-query.dto';
 import { TimetableService } from './timetable.service';
+
+type AppRole = Parameters<typeof Roles>[number];
 
 @ApiTags('timetable')
 @ApiBearerAuth()
@@ -13,7 +14,7 @@ export class TimetableController {
 
   // ── TEACHER: get own timetable ────────────────────────────────────────────
   @Get('teacher')
-  @Roles(Role.TEACHER)
+  @Roles('TEACHER' as AppRole)
   @ApiOperation({
     summary: 'Get teacher timetable for a week',
     description:
@@ -26,7 +27,7 @@ export class TimetableController {
 
   // ── STUDENT: get own timetable ────────────────────────────────────────────
   @Get('student')
-  @Roles(Role.STUDENT)
+  @Roles('STUDENT' as AppRole)
   @ApiOperation({
     summary: 'Get student timetable for a week',
     description:
@@ -39,7 +40,7 @@ export class TimetableController {
 
   // ── ADMIN: get timetable for any teacher ──────────────────────────────────
   @Get('teacher/:teacherId')
-  @Roles(Role.ADMIN)
+  @Roles('ADMIN' as AppRole)
   @ApiOperation({ summary: 'Admin: get timetable for a specific teacher' })
   @ApiParam({ name: 'teacherId', description: 'Teacher record ID' })
   @ApiQuery({ name: 'weekStart', required: false })
@@ -52,7 +53,7 @@ export class TimetableController {
 
   // ── ADMIN: get timetable for a group ──────────────────────────────────────
   @Get('group/:groupId')
-  @Roles(Role.ADMIN)
+  @Roles('ADMIN' as AppRole)
   @ApiOperation({ summary: 'Admin: get timetable for a specific group' })
   @ApiParam({ name: 'groupId', description: 'Group ID' })
   @ApiQuery({ name: 'weekStart', required: false })

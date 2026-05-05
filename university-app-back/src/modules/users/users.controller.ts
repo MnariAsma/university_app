@@ -11,8 +11,10 @@ import {
 import { CreateUserDto } from './dto/createUser.dto';
 import { UserService } from './users.service';
 import { UpdateUserDto } from './dto/updateUser.dto';
+
 import { Roles } from 'src/common/decorators/roles.decorator';
-import { Role } from '@prisma/client';
+
+type AppRole = Parameters<typeof Roles>[number];
 import { ApiBearerAuth } from '@nestjs/swagger';
 
 @ApiBearerAuth()
@@ -20,32 +22,35 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Roles(Role.ADMIN)
+  @Roles('ADMIN' as AppRole)
   @Post()
   create(@Body() dto: CreateUserDto) {
     return this.userService.createUser(dto);
   }
 
-  @Roles(Role.ADMIN)
+  @Roles('ADMIN' as AppRole)
   @Get()
   findAll() {
     return this.userService.findAll();
   }
 
-  @Roles(Role.ADMIN)
+  @Roles('ADMIN' as AppRole)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.userService.findById(id);
   }
 
-  @Roles(Role.ADMIN)
+  @Roles('ADMIN' as AppRole)
   @Patch(':id')
   update(@Param('id') id: string, @Body() dto: UpdateUserDto) {
     return this.userService.updateUser(id, dto);
   }
-  @Roles(Role.ADMIN)
+  @Roles('ADMIN' as AppRole)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.userService.deleteUser(id);
   }
 }
+
+
+

@@ -4,8 +4,10 @@ import { StudentService } from './student.service';
 import { CreateStudentDto } from './dto/createStudent.dto';
 import { UpdateStudentDto } from './dto/updateStudent.dto';
 import { Public } from 'src/common/decorators/public.decorator';
+
 import { Roles } from 'src/common/decorators/roles.decorator';
-import { Role } from '@prisma/client';
+
+type AppRole = Parameters<typeof Roles>[number];
 
 @ApiTags('students')
 @ApiBearerAuth()
@@ -19,27 +21,30 @@ export class StudentController {
     return this.studentService.create(dto);
   }
 
-  @Roles(Role.ADMIN)
+  @Roles('ADMIN' as AppRole)
   @Get()
   findAll() {
     return this.studentService.findAll();
   }
 
-  @Roles(Role.ADMIN,Role.TEACHER)
+  @Roles('ADMIN' as AppRole,'TEACHER' as AppRole)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.studentService.findOne(id);
   }
 
-   @Roles(Role.ADMIN)
+   @Roles('ADMIN' as AppRole)
   @Patch(':id')
   update(@Param('id') id: string, @Body() dto: UpdateStudentDto) {
     return this.studentService.update(id, dto);
   }
 
-  @Roles(Role.ADMIN)
+  @Roles('ADMIN' as AppRole)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.studentService.remove(id);
   }
 }
+
+
+
