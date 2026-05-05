@@ -363,6 +363,109 @@ async function main() {
   console.log(`📅 ACTIVE session ID:    ${activeSession.id}`);
   console.log(`📅 DONE session ID:      ${doneSession.id}`);
   console.log(`📅 YESTERDAY session ID: ${yesterdaySession.id}`);
+
+  // ──────────────────────────────────────────────
+  // Add sessions for every day this week (Mon-Sat)
+  // ──────────────────────────────────────────────
+  const today = new Date();
+  const weekStart = new Date(today);
+  weekStart.setDate(today.getDate() - today.getDay() + 1); // Monday
+  for (let d = 0; d < 6; d++) { // Mon-Sat
+    const day = new Date(weekStart);
+    day.setDate(weekStart.getDate() + d);
+    // Morning session 9-11am
+    await prisma.session.create({
+      data: {
+        title: `Demo Morning Session (${day.toLocaleDateString('en-CA')})`,
+        type: SessionType.COURSE,
+        subjectId: subject1.id,
+        teacherId: teacher.id,
+        groupId: group.id,
+        roomId: room.id,
+        adminId: admin!.id,
+        startDate: new Date(day.setHours(9, 0, 0, 0)),
+        endDate: new Date(day.setHours(11, 0, 0, 0)),
+      },
+    });
+    // Afternoon session 14-16h
+    const day2 = new Date(weekStart);
+    day2.setDate(weekStart.getDate() + d);
+    await prisma.session.create({
+      data: {
+        title: `Demo Afternoon Session (${day2.toLocaleDateString('en-CA')})`,
+        type: SessionType.TD,
+        subjectId: subject2.id,
+        teacherId: teacher.id,
+        groupId: group.id,
+        roomId: room.id,
+        adminId: admin!.id,
+        startDate: new Date(day2.setHours(14, 0, 0, 0)),
+        endDate: new Date(day2.setHours(16, 0, 0, 0)),
+      },
+    });
+  }
+
+  // ──────────────────────────────────────────────
+  // 4 sessions for today: passed, current, upcoming
+  // ──────────────────────────────────────────────
+  const todayDate = new Date();
+  todayDate.setHours(0, 0, 0, 0);
+  // Passed: 7:00–8:00
+  await prisma.session.create({
+    data: {
+      title: 'Passed Session (7:00–8:00)',
+      type: SessionType.COURSE,
+      subjectId: subject1.id,
+      teacherId: teacher.id,
+      groupId: group.id,
+      roomId: room.id,
+      adminId: admin!.id,
+      startDate: new Date(todayDate.getTime() + 7 * 60 * 60 * 1000),
+      endDate: new Date(todayDate.getTime() + 8 * 60 * 60 * 1000),
+    },
+  });
+  // Passed: 9:00–10:00
+  await prisma.session.create({
+    data: {
+      title: 'Passed Session (9:00–10:00)',
+      type: SessionType.TD,
+      subjectId: subject2.id,
+      teacherId: teacher.id,
+      groupId: group.id,
+      roomId: room.id,
+      adminId: admin!.id,
+      startDate: new Date(todayDate.getTime() + 9 * 60 * 60 * 1000),
+      endDate: new Date(todayDate.getTime() + 10 * 60 * 60 * 1000),
+    },
+  });
+  // Current: now–now+1h
+  await prisma.session.create({
+    data: {
+      title: 'Current Session (now)',
+      type: SessionType.COURSE,
+      subjectId: subject1.id,
+      teacherId: teacher.id,
+      groupId: group.id,
+      roomId: room.id,
+      adminId: admin!.id,
+      startDate: new Date(now.getTime() - 10 * 60 * 1000),
+      endDate: new Date(now.getTime() + 50 * 60 * 1000),
+    },
+  });
+  // Upcoming: now+2h–now+3h
+  await prisma.session.create({
+    data: {
+      title: 'Upcoming Session (in 2h)',
+      type: SessionType.TD,
+      subjectId: subject2.id,
+      teacherId: teacher.id,
+      groupId: group.id,
+      roomId: room.id,
+      adminId: admin!.id,
+      startDate: new Date(now.getTime() + 2 * 60 * 60 * 1000),
+      endDate: new Date(now.getTime() + 3 * 60 * 60 * 1000),
+    },
+  });
 }
 
 main()
