@@ -8,6 +8,7 @@ import { setupListeners } from "@reduxjs/toolkit/query";
 import authReducer from "../modules/auth/slices/authSlice";
 import toastReducer from "../slices/toast/toastSlice";
 import { announcementApi } from "../modules/announcement/api/announcementApi";
+import { requestsApi } from "../modules/requests/api/requestsApi";
 
 export const store = configureStore({
   reducer: {
@@ -16,21 +17,18 @@ export const store = configureStore({
     [authApi.reducerPath]: authApi.reducer,
     [gradeApi.reducerPath]: gradeApi.reducer,
     [courseApi.reducerPath]: courseApi.reducer,
-
     [presenceApi.reducerPath]: presenceApi.reducer,
     [announcementApi.reducerPath]: announcementApi.reducer,
-
+    [requestsApi.reducerPath]: requestsApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
       authApi.middleware,
       gradeApi.middleware,
       courseApi.middleware,
-
       presenceApi.middleware,
-
-      announcementApi.middleware
-
+      announcementApi.middleware,
+      requestsApi.middleware
     ),
 });
 

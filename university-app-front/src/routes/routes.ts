@@ -12,6 +12,7 @@ export const RESET_PASSWORD = "/reset-password";
 export const GRADES = "/grades";
 export const COURSES = "/courses";
 
-export const PRESENCE = "/presence";  
+export const PRESENCE = "/presence";
 export const ANNOUNCEMENTS = "/announcements";
+export const REQUESTS = "/requests";
 export const NOTFOUND = "*";
