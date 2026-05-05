@@ -1,4 +1,4 @@
-import TimetableDashboard from "../../modules/timetable/Components/TimetableDashboard";
+import TimetableDashboard from "../../modules/timetable/Teacher/Components/TimetableDashboard";
 
 const TimetablePage = () => {
   return <TimetableDashboard />;

@@ -3,7 +3,7 @@ import { authApi } from "../modules/auth/Apis/AuthApi";
 import { gradeApi } from "../modules/grade/Apis/GradeApi";
 import { courseApi } from "../modules/course/Apis/CourseApi";
 import { presenceApi } from "../modules/presence/Apis/PresenceApi";
-import { timetableApi } from "../modules/timetable/Apis/TimetableApi";
+import { timetableApi } from "../modules/timetable/Teacher/Apis/TimetableApi";
 import { setupListeners } from "@reduxjs/toolkit/query";
 import authReducer from "../modules/auth/slices/authSlice";
 import toastReducer from "../slices/toast/toastSlice";

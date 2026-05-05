@@ -12,6 +12,7 @@ import {
 import { ChevronLeft, ChevronRight, Today } from "@mui/icons-material";
 import { useGetTeacherTimetableQuery } from "../Apis/TimetableApi";
 import type { TimetableSession } from "../Apis/TimetableApi";
+import type { RootState } from "../../../../store/store";
 import {
   DAYS,
   TIME_SLOTS,
@@ -40,7 +41,7 @@ import {
   detailPanelWrapper,
   emptyState,
   legendChip,
-} from "../../../pages/TimetablePage/TimetablePageStyle";
+} from "../../../../pages/TimetablePage/TimetablePageStyle";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 

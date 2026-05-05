@@ -68,6 +68,7 @@ model Department {
   @@map("departments")
 }
 
+//filiere
 model Program {
   id              String           @id @default(cuid())
   name            String
@@ -157,6 +158,7 @@ model Teacher {
   @@map("teachers")
 }
 
+//matiere
 model Subject {
   id          String           @id @default(cuid())
   name        String
