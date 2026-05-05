@@ -2,11 +2,10 @@ import React from "react";
 import { Link } from "react-router-dom";
 import {
   AutoStories,
-  Campaign,
-  Event,
-  Groups,
-  MarkUnreadChatAlt,
-  School,
+  CalendarMonth,
+  CircleNotifications,
+  ShowChart,
+  WarningAmber,
 } from "@mui/icons-material";
 import useSWR from "swr";
 import Card from "../Components/Card";
@@ -15,26 +14,27 @@ import { API_BASE_URL } from "../constants/api";
 import { ANNOUNCEMENTS, GRADES, TIMETABLE } from "../routes/routes";
 import { useAppSelector } from "../hooks/reduxHooks";
 
-type TeacherDashboardResponse = {
+type StudentDashboardResponse = {
   profile: {
     firstName: string;
     lastName: string;
+    program: string;
     department: string;
-    specialty: string | null;
+    level: string;
+    group: string;
   };
   stats: {
-    courses: number;
-    subjects: number;
-    students: number;
-    todaySessions: number;
+    averageGrade: number | null;
+    absences: number;
+    activeCourses: number;
     unreadNotifications: number;
-    announcements: number;
+    eliminationRisks: number;
   };
   nextSession: {
     title: string;
     subject: string;
-    group: string;
     room: string | null;
+    teacher: string;
     startDate: string;
     endDate: string;
   } | null;
@@ -42,6 +42,7 @@ type TeacherDashboardResponse = {
     id: string;
     title: string;
     type: string;
+    author: string;
     createdAt: string;
   }>;
 };
@@ -55,68 +56,69 @@ const formatDateTime = (value: string) =>
     minute: "2-digit",
   }).format(new Date(value));
 
-const TeacherDashboard: React.FC = () => {
+const StudentDashboard: React.FC = () => {
   const token = useAppSelector((state) => state.auth.token);
   const currentUser = useAppSelector((state) => state.auth.user);
 
-  const { data, error, isLoading } = useSWR<TeacherDashboardResponse>(
-    token ? [`${API_BASE_URL}/dashboard/teacher`, token] : null,
+  const { data, error, isLoading } = useSWR<StudentDashboardResponse>(
+    token ? [`${API_BASE_URL}/dashboard/student`, token] : null,
     ([url, authToken]: [string, string | null]) => fetcher(url, authToken)
   );
 
-  const stats = [
+  const overviewCards = [
     {
-      label: "Courses",
-      value: data?.stats.courses ?? "--",
-      helper: "Published learning material sets",
+      label: "Average grade",
+      value:
+        data?.stats.averageGrade !== null && data?.stats.averageGrade !== undefined
+          ? data.stats.averageGrade.toFixed(2)
+          : "Pending",
+      helper: "Current academic average",
+      icon: <ShowChart fontSize="small" />,
+    },
+    {
+      label: "Absences",
+      value: data?.stats.absences ?? "--",
+      helper: "Recorded missed sessions",
+      icon: <CalendarMonth fontSize="small" />,
+    },
+    {
+      label: "Available courses",
+      value: data?.stats.activeCourses ?? "--",
+      helper: "Published learning materials",
       icon: <AutoStories fontSize="small" />,
     },
     {
-      label: "Subjects",
-      value: data?.stats.subjects ?? "--",
-      helper: "Distinct teaching assignments",
-      icon: <School fontSize="small" />,
-    },
-    {
-      label: "Students reached",
-      value: data?.stats.students ?? "--",
-      helper: "Unique learners across your groups",
-      icon: <Groups fontSize="small" />,
-    },
-    {
-      label: "Today’s sessions",
-      value: data?.stats.todaySessions ?? "--",
-      helper: "Scheduled classroom moments today",
-      icon: <Event fontSize="small" />,
+      label: "Unread alerts",
+      value: data?.stats.unreadNotifications ?? "--",
+      helper: "Notifications waiting for you",
+      icon: <CircleNotifications fontSize="small" />,
     },
   ];
 
   return (
     <div className="space-y-6 p-6">
-      <section className="overflow-hidden rounded-[28px] bg-gradient-to-r from-slate-950 via-emerald-900 to-teal-700 px-6 py-7 text-white shadow-xl">
+      <section className="overflow-hidden rounded-[28px] bg-gradient-to-r from-slate-950 via-sky-900 to-cyan-700 px-6 py-7 text-white shadow-xl">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl space-y-3">
-            <p className="text-sm uppercase tracking-[0.28em] text-emerald-100/80">
-              Teaching overview
+            <p className="text-sm uppercase tracking-[0.28em] text-cyan-100/80">
+              Student overview
             </p>
             <h1 className="text-3xl font-semibold leading-tight md:text-4xl">
-              Hello, {data?.profile.firstName ?? currentUser?.firstName ?? "Teacher"}.
+              Welcome back, {data?.profile.firstName ?? currentUser?.firstName ?? "Student"}.
             </h1>
             <p className="max-w-xl text-sm text-slate-100/85 md:text-base">
-              Keep today’s teaching flow visible at a glance, from session cadence to student
-              reach and recent announcements.
+              Keep an eye on your academic rhythm with one clean snapshot of your progress,
+              upcoming class, and latest teaching updates.
             </p>
             <div className="flex flex-wrap gap-2 pt-1 text-sm text-white/90">
               <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1">
-                {data?.profile.department ?? "Department"}
+                {data?.profile.program ?? "Program pending"}
               </span>
-              {data?.profile.specialty ? (
-                <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1">
-                  {data.profile.specialty}
-                </span>
-              ) : null}
               <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1">
-                {data?.stats.unreadNotifications ?? 0} unread notifications
+                {data?.profile.level ?? "Level"} · {data?.profile.group ?? "Group"}
+              </span>
+              <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1">
+                {data?.profile.department ?? "Department"}
               </span>
             </div>
           </div>
@@ -126,13 +128,13 @@ const TeacherDashboard: React.FC = () => {
               to={GRADES}
               className="rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-slate-900 transition hover:bg-slate-100"
             >
-              Grade students
+              Review grades
             </Link>
             <Link
-              to={ANNOUNCEMENTS}
+              to={TIMETABLE}
               className="rounded-full border border-white/25 bg-white/10 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/15"
             >
-              Manage announcements
+              Open timetable
             </Link>
           </div>
         </div>
@@ -147,7 +149,7 @@ const TeacherDashboard: React.FC = () => {
       ) : null}
 
       <section className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {stats.map((item) => (
+        {overviewCards.map((item) => (
           <Card key={item.label} title={item.label}>
             <div className="flex items-start justify-between gap-3">
               <div>
@@ -166,17 +168,17 @@ const TeacherDashboard: React.FC = () => {
 
       <section className="grid grid-cols-1 gap-6 xl:grid-cols-[1.4fr_1fr]">
         <div className="space-y-6">
-          <Card title="Next session">
+          <Card title="Next academic moment">
             {data?.nextSession ? (
               <div className="space-y-4">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <p className="text-xl font-semibold text-slate-900">{data.nextSession.title}</p>
                     <p className="mt-1 text-sm text-slate-500">
-                      {data.nextSession.subject} · Group {data.nextSession.group}
+                      {data.nextSession.subject} with {data.nextSession.teacher}
                     </p>
                   </div>
-                  <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-700">
+                  <span className="rounded-full bg-cyan-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-cyan-700">
                     {formatDateTime(data.nextSession.startDate)}
                   </span>
                 </div>
@@ -194,87 +196,81 @@ const TeacherDashboard: React.FC = () => {
                     </p>
                   </div>
                 </div>
-                <Link
-                  to={TIMETABLE}
-                  className="inline-flex rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white"
-                >
-                  Open timetable
-                </Link>
               </div>
             ) : (
               <p className="text-sm text-slate-500">
-                No future session is scheduled yet. Your timetable will update when sessions are assigned.
+                No upcoming session is scheduled yet. Check your timetable later for updates.
               </p>
             )}
           </Card>
 
-          <Card title="Recent announcements">
+          <Card title="Latest announcements">
             {data?.recentAnnouncements.length ? (
               <div className="space-y-3">
                 {data.recentAnnouncements.map((announcement) => (
                   <Link
                     key={announcement.id}
                     to={ANNOUNCEMENTS}
-                    className="block rounded-2xl border border-slate-100 px-4 py-3 transition hover:border-emerald-200 hover:bg-emerald-50/60"
+                    className="block rounded-2xl border border-slate-100 px-4 py-3 transition hover:border-cyan-200 hover:bg-cyan-50/60"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <p className="font-medium text-slate-900">{announcement.title}</p>
-                        <p className="mt-1 text-sm text-slate-500">
-                          {formatDateTime(announcement.createdAt)}
-                        </p>
+                        <p className="mt-1 text-sm text-slate-500">{announcement.author}</p>
                       </div>
                       <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">
                         {announcement.type}
                       </span>
                     </div>
+                    <p className="mt-2 text-xs text-slate-400">
+                      {formatDateTime(announcement.createdAt)}
+                    </p>
                   </Link>
                 ))}
               </div>
             ) : (
               <p className="text-sm text-slate-500">
-                No announcements published yet. Use announcements to keep groups aligned.
+                No announcements have been published for your stream yet.
               </p>
             )}
           </Card>
         </div>
 
         <div className="space-y-6">
-          <Card title="Teaching pulse">
+          <Card title="Academic pulse">
             <div className="space-y-4">
               <div className="rounded-2xl bg-slate-50 p-4">
-                <div className="flex items-center justify-between gap-3">
+                <p className="text-sm font-medium text-slate-700">Attendance status</p>
+                <div className="mt-3 flex items-end justify-between gap-3">
                   <div>
-                    <p className="text-sm font-medium text-slate-700">Unread notifications</p>
-                    <p className="mt-2 text-2xl font-semibold text-slate-900">
-                      {data?.stats.unreadNotifications ?? 0}
+                    <p className="text-2xl font-semibold text-slate-900">
+                      {data?.stats.absences ?? 0}
                     </p>
+                    <p className="text-sm text-slate-500">absences recorded so far</p>
                   </div>
-                  <MarkUnreadChatAlt className="text-emerald-500" />
+                  <WarningAmber className="text-amber-500" />
                 </div>
               </div>
 
               <div className="rounded-2xl bg-slate-50 p-4">
-                <div className="flex items-center justify-between gap-3">
-                  <div>
-                    <p className="text-sm font-medium text-slate-700">Announcements published</p>
-                    <p className="mt-2 text-2xl font-semibold text-slate-900">
-                      {data?.stats.announcements ?? 0}
-                    </p>
-                  </div>
-                  <Campaign className="text-emerald-500" />
-                </div>
+                <p className="text-sm font-medium text-slate-700">Elimination alerts</p>
+                <p className="mt-2 text-2xl font-semibold text-slate-900">
+                  {data?.stats.eliminationRisks ?? 0}
+                </p>
+                <p className="mt-1 text-sm text-slate-500">
+                  subjects currently marked at risk.
+                </p>
               </div>
 
               <div className="rounded-2xl bg-gradient-to-br from-slate-900 to-slate-700 p-4 text-white">
                 <p className="text-sm font-medium text-slate-200">Best next step</p>
                 <p className="mt-2 text-lg font-semibold">
-                  {data?.stats.todaySessions
-                    ? "Prepare the next session flow and publish updates before students arrive."
-                    : "Use the quieter window to review grades or publish a clear announcement."}
+                  {data?.stats.averageGrade && data.stats.averageGrade >= 10
+                    ? "Keep momentum by checking fresh announcements before your next class."
+                    : "Review your latest grades and upcoming session to recover early."}
                 </p>
                 <Link
-                  to={data?.stats.todaySessions ? TIMETABLE : ANNOUNCEMENTS}
+                  to={data?.stats.averageGrade && data.stats.averageGrade >= 10 ? ANNOUNCEMENTS : GRADES}
                   className="mt-4 inline-flex rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-900"
                 >
                   Open focus area
@@ -288,4 +284,4 @@ const TeacherDashboard: React.FC = () => {
   );
 };
 
-export default TeacherDashboard;
+export default StudentDashboard;

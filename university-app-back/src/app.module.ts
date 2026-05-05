@@ -25,6 +25,7 @@ import { AnnouncementsModule } from './modules/announcements/announcements.modul
 import { RequestsModule } from './modules/requests/requests.module';
 import { AppCacheModule } from './cache/cache.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
+import { DashboardModule } from './modules/dashboard/dashboard.module';
 
 import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard';
 import { APP_GUARD } from '@nestjs/core';
@@ -61,6 +62,7 @@ import {CourseAiModule} from "./modules/course/course-ai/course-ai.module";
     AiModule,
     CourseAiModule,
     NotificationsModule,
+    DashboardModule,
   ],
   controllers: [AppController],
   providers: [

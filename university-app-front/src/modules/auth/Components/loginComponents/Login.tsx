@@ -20,7 +20,11 @@ import { useAppDispatch } from "../../../../hooks/reduxHooks";
 import { addToast } from "../../../../slices/toast/toastSlice";
 import { useNavigate, Link } from "react-router-dom";
 import type { LoginFormValues } from "./loginInterface";
-import { DASHBOARD, REQUESTS } from "../../../../routes/routes";
+import {
+  DASHBOARD,
+  STUDENT_DASHBOARD,
+  TEACHER_DASHBOARD,
+} from "../../../../routes/routes";
 import { ROLES } from "../../../../constants/constants";
 
 export default function LoginComponent() {
@@ -46,9 +50,9 @@ export default function LoginComponent() {
       );
       const role = response.user.role;
       if (role === ROLES.TEACHER) {
-        navigate(DASHBOARD);
+        navigate(TEACHER_DASHBOARD);
       } else if (role === ROLES.STUDENT) {
-        navigate(REQUESTS);
+        navigate(STUDENT_DASHBOARD);
       } else {
         navigate(DASHBOARD);
       }

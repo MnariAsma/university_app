@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -312,17 +312,70 @@ const HistorySection = () => {
 
 // ── Main Dashboard ────────────────────────────────────────────────────────────
 const PresenceDashboard = () => {
-  const { data: todayData, isLoading } = useGetTodaySessionsQuery();
+  const {
+    data: todayData,
+    isLoading,
+    isFetching,
+    error,
+    refetch,
+  } = useGetTodaySessionsQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+    refetchOnFocus: true,
+    refetchOnReconnect: true,
+  });
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
+
+  useEffect(() => {
+    if (!todayData?.sessions.length) {
+      return;
+    }
+
+    const sessionStillExists = todayData.sessions.some(
+      (session) => session.id === selectedSessionId,
+    );
+
+    if (selectedSessionId && sessionStillExists) {
+      return;
+    }
+
+    const defaultSession =
+      todayData.sessions.find((session) => session.status === "ACTIVE") ??
+      todayData.sessions.find((session) => session.status === "UPCOMING") ??
+      todayData.sessions[0];
+
+    setSelectedSessionId(defaultSession.id);
+  }, [todayData, selectedSessionId]);
+
+  const errorMessage = (() => {
+    if (!error) return null;
+    if ("status" in error) {
+      const apiMessage =
+        typeof error.data === "object" &&
+        error.data !== null &&
+        "message" in error.data &&
+        typeof error.data.message === "string"
+          ? error.data.message
+          : null;
+
+      return apiMessage ?? `Could not load today's sessions (${String(error.status)}).`;
+    }
+
+    return error.message ?? "Could not load today's sessions.";
+  })();
 
   return (
     <Box sx={{ p: 3 }}>
       <Stack direction="row" spacing={2} sx={{ justifyContent: "space-between", alignItems: "center", mb: 3 }}>
         <Typography variant="h5" sx={{ fontWeight: "bold" }}>Presence</Typography>
-        <Button variant="outlined" onClick={() => setShowHistory((v) => !v)}>
-          {showHistory ? "Hide History" : "View History"}
-        </Button>
+        <Stack direction="row" spacing={1}>
+          <Button variant="outlined" onClick={() => refetch()} disabled={isFetching}>
+            {isFetching ? "Refreshing..." : "Refresh Sessions"}
+          </Button>
+          <Button variant="outlined" onClick={() => setShowHistory((v) => !v)}>
+            {showHistory ? "Hide History" : "View History"}
+          </Button>
+        </Stack>
       </Stack>
 
       {/* Today's sessions */}
@@ -332,8 +385,18 @@ const PresenceDashboard = () => {
 
       {isLoading && <CircularProgress size={24} />}
 
+      {errorMessage && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {errorMessage}
+        </Alert>
+      )}
+
       {todayData?.message && (
         <Alert severity="info">{todayData.message}</Alert>
+      )}
+
+      {!isLoading && !errorMessage && todayData && todayData.sessions.length === 0 && !todayData.message && (
+        <Alert severity="info">No sessions were returned for today.</Alert>
       )}
 
       {todayData?.sessions.map((session) => (

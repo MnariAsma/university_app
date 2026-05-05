@@ -12,10 +12,13 @@ import {
   ANNOUNCEMENTS,
   REQUESTS,
   TIMETABLE,
+  STUDENT_DASHBOARD,
+  TEACHER_DASHBOARD,
 } from "./routes/routes";
 import ToastContainer from "./Components/Toasts/toast";
 import LoginPage from "./pages/LoginPage/loginPage";
 import TeacherDashboard from "./pages/TeacherDashboard";
+import StudentDashboard from "./pages/StudentDashboard";
 import GradesPage from "./pages/GradesPage/GradesPage";
 import CoursesPage from "./pages/CoursesPage/CoursesPage";
 import PresencePage from "./pages/PresencePage/PresencePage";
@@ -24,6 +27,21 @@ import NotFoundPage from "./pages/NotFoundPage/NotFoundPage";
 import AnnouncementsPage from "./pages/AnnouncementsPage/AnnouncementsPage";
 import AppLayout from "./Components/layout/AppLayout";
 import RequestsPage from "./pages/RequestsPage/RequestsPage";
+import { useAppSelector } from "./hooks/reduxHooks";
+
+function DashboardEntry() {
+  const user = useAppSelector((state) => state.auth.user);
+
+  if (user?.role === ROLES.TEACHER) {
+    return <Navigate to={TEACHER_DASHBOARD} replace />;
+  }
+
+  if (user?.role === ROLES.STUDENT) {
+    return <Navigate to={STUDENT_DASHBOARD} replace />;
+  }
+
+  return <Navigate to={AUTH} replace />;
+}
 
 function App() {
   return (
@@ -32,11 +50,12 @@ function App() {
       <Routes>
         <Route path={HOME} element={<Navigate to={AUTH} replace />} />
         <Route path={AUTH} element={<LoginPage />} />
+        <Route path={DASHBOARD} element={<DashboardEntry />} />
 
         {/* Teacher routes */}
         <Route element={<ProtectedRoute allowedRoles={[ROLES.TEACHER]} />}>
           <Route
-            path={DASHBOARD}
+            path={TEACHER_DASHBOARD}
             element={
               <AppLayout>
                 <TeacherDashboard />
@@ -45,19 +64,16 @@ function App() {
           />
         </Route>
 
-        <Route element={<ProtectedRoute allowedRoles={[ROLES.TEACHER, ROLES.STUDENT]} />}>
+        {/* Student routes */}
+        <Route element={<ProtectedRoute allowedRoles={[ROLES.STUDENT]} />}>
           <Route
-            path={TIMETABLE}
+            path={STUDENT_DASHBOARD}
             element={
               <AppLayout>
-                <TimetablePage />
+                <StudentDashboard />
               </AppLayout>
             }
           />
-        </Route>
-
-        {/* Student routes */}
-        <Route element={<ProtectedRoute allowedRoles={[ROLES.STUDENT]} />}>
           <Route
             path={REQUESTS}
             element={
@@ -99,6 +115,14 @@ function App() {
             element={
               <AppLayout>
                 <PresencePage />
+              </AppLayout>
+            }
+          />
+          <Route
+            path={TIMETABLE}
+            element={
+              <AppLayout>
+                <TimetablePage />
               </AppLayout>
             }
           />
