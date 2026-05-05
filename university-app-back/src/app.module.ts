@@ -23,8 +23,8 @@ import { StudentModule } from './modules/student/student.module';
 import { MailModule } from './modules/mail/mail.module';
 import { AnnouncementsModule } from './modules/announcements/announcements.module';
 import { RequestsModule } from './modules/requests/requests.module';
-
 import { AppCacheModule } from './cache/cache.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 
 import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard';
 import { APP_GUARD } from '@nestjs/core';
@@ -60,7 +60,7 @@ import {CourseAiModule} from "./modules/course/course-ai/course-ai.module";
     AppCacheModule,
     AiModule,
     CourseAiModule,
-
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [

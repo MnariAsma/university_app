@@ -136,6 +136,12 @@ export const presenceApi = createApi({
       },
       providesTags: ["History"],
     }),
+
+    // GET /absences/student/my
+    getMyAbsences: builder.query<any[], void>({
+      query: () => "/absences/student/my",
+      providesTags: ["History"],
+    }),
   }),
 });
 
@@ -145,4 +151,5 @@ export const {
   useGetSessionStudentListQuery,
   useMarkAttendanceMutation,
   useGetAttendanceHistoryQuery,
+  useGetMyAbsencesQuery,
 } = presenceApi;

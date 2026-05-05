@@ -1,11 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/common/prisma.service';
 import { CreateGradesDto } from './dto/create-grades.dto';
-import { TeacherSubject, Program, Level, Subject } from '@prisma/client';
+import { TeacherSubject, Program, Level, Subject, NotificationType } from '@prisma/client';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class GradeService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private notificationsService: NotificationsService,
+  ) {}
 
   async findTeacherSubjects(userId: string) {
     const teacher = await this.prisma.teacher.findUnique({ where: { userId } });
@@ -169,6 +173,29 @@ async upsertGrades(dto: CreateGradesDto, userId: string) {
         },
       });
       results.push(created);
+    }
+  }
+
+  // Notify students that their grade has been updated
+  const subject = await this.prisma.subject.findUnique({
+    where: { id: dto.subjectId },
+  });
+
+  if (subject) {
+    for (const g of dto.grades) {
+      const student = await this.prisma.student.findUnique({
+        where: { id: g.studentId },
+        select: { userId: true },
+      });
+      if (student) {
+        await this.notificationsService.createNotification({
+          userId: student.userId,
+          title: 'Note Publiée',
+          message: `Une nouvelle note a été ajoutée pour la matière ${subject.name}.`,
+          type: NotificationType.GRADE,
+          redirectLink: '/grades',
+        });
+      }
     }
   }
 

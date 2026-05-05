@@ -10,6 +10,7 @@ import authReducer from "../modules/auth/slices/authSlice";
 import toastReducer from "../slices/toast/toastSlice";
 import { announcementApi } from "../modules/announcement/api/announcementApi";
 import { requestsApi } from "../modules/requests/api/requestsApi";
+import { notificationApi } from "../modules/notification/api/notificationApi";
 
 export const store = configureStore({
   reducer: {
@@ -22,7 +23,7 @@ export const store = configureStore({
     [timetableApi.reducerPath]: timetableApi.reducer,
     [announcementApi.reducerPath]: announcementApi.reducer,
     [requestsApi.reducerPath]: requestsApi.reducer,
-
+    [notificationApi.reducerPath]: notificationApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -32,8 +33,8 @@ export const store = configureStore({
       presenceApi.middleware,
       timetableApi.middleware,
       announcementApi.middleware,
-      requestsApi.middleware
-
+      requestsApi.middleware,
+      notificationApi.middleware
     ),
 });
 

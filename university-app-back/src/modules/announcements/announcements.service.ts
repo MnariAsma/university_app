@@ -1,11 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from 'src/common/prisma.service';
+import { PrismaService } from '../../common/prisma.service';
 import { CreateAnnouncementDto } from './dto/create-announcement.dto';
 import { NotificationType } from '@prisma/client';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class AnnouncementsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notificationsService: NotificationsService,
+  ) {}
 
   async create(userId: string, dto: CreateAnnouncementDto) {
     const teacher = await this.prisma.teacher.findUnique({
@@ -94,16 +98,15 @@ export class AnnouncementsService {
 
     // 3. Create notifications
     if (studentIds.length > 0) {
-      const notifications = studentIds.map((userId) => ({
-        title: dto.title,
-        message: dto.content,
-        type: (dto.type === 'ABSENCE' ? 'ABSENCE' : dto.type === 'EXAM' ? 'EXAM' : 'INFO') as NotificationType,
-        userId,
-      }));
-
-      await this.prisma.notification.createMany({
-        data: notifications,
-      });
+      for (const userId of studentIds) {
+        await this.notificationsService.createNotification({
+          userId,
+          title: dto.title,
+          message: dto.content,
+          type: (dto.type === 'ABSENCE' ? 'ABSENCE' : dto.type === 'EXAM' ? 'EXAM' : 'INFO') as NotificationType,
+          redirectLink: '/announcements',
+        });
+      }
     }
 
     return announcement;

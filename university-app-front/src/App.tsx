@@ -23,7 +23,6 @@ import TimetablePage from "./pages/TimetablePage/TimetablePage";
 import NotFoundPage from "./pages/NotFoundPage/NotFoundPage";
 import AnnouncementsPage from "./pages/AnnouncementsPage/AnnouncementsPage";
 import AppLayout from "./Components/layout/AppLayout";
-import AnnouncementDashboard from "./modules/announcement/Components/AnnouncementDashboard";
 import RequestsPage from "./pages/RequestsPage/RequestsPage";
 
 function App() {
@@ -44,15 +43,6 @@ function App() {
               </AppLayout>
             }
           />
-          <Route
-            path={PRESENCE}
-            element={
-              <AppLayout>
-                <PresencePage />
-              </AppLayout>
-            }
-          />
-
         </Route>
 
         <Route element={<ProtectedRoute allowedRoles={[ROLES.TEACHER, ROLES.STUDENT]} />}>
@@ -101,6 +91,14 @@ function App() {
             element={
               <AppLayout>
                 <AnnouncementsPage />
+              </AppLayout>
+            }
+          />
+          <Route
+            path={PRESENCE}
+            element={
+              <AppLayout>
+                <PresencePage />
               </AppLayout>
             }
           />
