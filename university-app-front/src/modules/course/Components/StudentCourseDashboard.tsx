@@ -165,8 +165,22 @@ const StudentCourseDashboard = () => {
       const res = await fetch(`${API_BASE_URL}${endpoint}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      const data = await res.json();
-      setDialogContent(data.summary || data.quiz || data.data || JSON.stringify(data));
+      const contentType = res.headers.get("content-type") || "";
+      const raw = await res.text();
+      if (!res.ok) {
+        throw new Error(raw || "Request failed");
+      }
+      let data: any = raw;
+      if (contentType.includes("application/json")) {
+        data = JSON.parse(raw);
+      } else {
+        try {
+          data = JSON.parse(raw);
+        } catch {
+          data = raw;
+        }
+      }
+      setDialogContent(data.summary || data.quiz || data.data || String(data));
     } catch (e) {
       setDialogContent("Failed to load.");
     }
