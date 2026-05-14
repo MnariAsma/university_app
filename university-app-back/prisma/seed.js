@@ -1,0 +1,342 @@
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+const adapter_pg_1 = require("@prisma/adapter-pg");
+const client_1 = require("@prisma/client");
+const bcrypt = __importStar(require("bcrypt"));
+const adapter = new adapter_pg_1.PrismaPg({ connectionString: process.env.DATABASE_URL });
+const prisma = new client_1.PrismaClient({ adapter });
+async function main() {
+    const password = await bcrypt.hash('123456', 10);
+    const academicYear = await prisma.academicYear.upsert({
+        where: { label: '2025-2026' },
+        update: {},
+        create: {
+            label: '2025-2026',
+            startDate: new Date('2025-09-01'),
+            endDate: new Date('2026-06-30'),
+            active: true,
+        },
+    });
+    const department = await prisma.department.upsert({
+        where: { code: 'INFO' },
+        update: {},
+        create: {
+            name: 'Informatique',
+            code: 'INFO',
+        },
+    });
+    const program = await prisma.program.upsert({
+        where: { code: 'ING-INFO' },
+        update: {},
+        create: {
+            name: 'Ingénierie Informatique',
+            code: 'ING-INFO',
+            level: 'ING',
+            departmentId: department.id,
+        },
+    });
+    let level;
+    const existingLevel = await prisma.level.findFirst({
+        where: { name: '2ème année', programId: program.id },
+    });
+    if (existingLevel) {
+        level = existingLevel;
+    }
+    else {
+        level = await prisma.level.create({
+            data: { name: '2ème année', order: 2, programId: program.id },
+        });
+    }
+    let group;
+    const existingGroup = await prisma.group.findUnique({ where: { code: 'Gr-1' } });
+    if (existingGroup) {
+        group = existingGroup;
+    }
+    else {
+        group = await prisma.group.create({
+            data: { name: 'Groupe 1', code: 'Gr-1', levelId: level.id },
+        });
+    }
+    let room;
+    const existingRoom = await prisma.room.findUnique({ where: { name: 'Salle 101' } });
+    if (existingRoom) {
+        room = existingRoom;
+    }
+    else {
+        room = await prisma.room.create({
+            data: { name: 'Salle 101', capacity: 30, building: 'Bâtiment A' },
+        });
+    }
+    let subject1;
+    const existingSubject1 = await prisma.subject.findUnique({ where: { code: 'WEB02' } });
+    if (existingSubject1) {
+        subject1 = existingSubject1;
+    }
+    else {
+        subject1 = await prisma.subject.create({
+            data: { name: 'Programmation Web', code: 'WEB02', semester: 1, programId: program.id },
+        });
+    }
+    let subject2;
+    const existingSubject2 = await prisma.subject.findUnique({ where: { code: 'DB02' } });
+    if (existingSubject2) {
+        subject2 = existingSubject2;
+    }
+    else {
+        subject2 = await prisma.subject.create({
+            data: { name: 'Base de Données', code: 'DB02', semester: 1, programId: program.id },
+        });
+    }
+    let adminUser;
+    const existingAdmin = await prisma.user.findUnique({ where: { email: 'admin@test.com' } });
+    if (existingAdmin) {
+        adminUser = existingAdmin;
+    }
+    else {
+        adminUser = await prisma.user.create({
+            data: {
+                email: 'admin@test.com',
+                password,
+                role: client_1.Role.ADMIN,
+                firstName: 'Admin',
+                lastName: 'Test',
+                admin: { create: {} },
+            },
+            include: { admin: true },
+        });
+    }
+    const admin = await prisma.admin.findUnique({ where: { userId: adminUser.id } });
+    let teacherUser;
+    let teacher;
+    const existingTeacherUser = await prisma.user.findUnique({ where: { email: 'teacher1@test.com' } });
+    if (existingTeacherUser) {
+        teacherUser = existingTeacherUser;
+        teacher = await prisma.teacher.findUnique({ where: { userId: teacherUser.id } });
+    }
+    else {
+        teacherUser = await prisma.user.create({
+            data: {
+                email: 'teacher1@test.com',
+                password,
+                role: client_1.Role.TEACHER,
+                firstName: 'Ali',
+                lastName: 'Teacher',
+            },
+        });
+        teacher = await prisma.teacher.create({
+            data: {
+                matricule: 'T-002',
+                userId: teacherUser.id,
+                departmentId: department.id,
+                specialty: 'Informatique',
+            },
+        });
+    }
+    const existingTs1 = await prisma.teacherSubject.findFirst({
+        where: {
+            teacherId: teacher.id,
+            subjectId: subject1.id,
+            academicYearId: academicYear.id,
+            programId: program.id,
+            levelId: level.id,
+        },
+    });
+    if (!existingTs1) {
+        await prisma.teacherSubject.create({
+            data: {
+                teacherId: teacher.id,
+                subjectId: subject1.id,
+                academicYearId: academicYear.id,
+                courseType: client_1.CourseType.COURSE,
+                programId: program.id,
+                levelId: level.id,
+            },
+        });
+    }
+    const existingTs2 = await prisma.teacherSubject.findFirst({
+        where: {
+            teacherId: teacher.id,
+            subjectId: subject2.id,
+            academicYearId: academicYear.id,
+            programId: program.id,
+            levelId: level.id,
+        },
+    });
+    if (!existingTs2) {
+        await prisma.teacherSubject.create({
+            data: {
+                teacherId: teacher.id,
+                subjectId: subject2.id,
+                academicYearId: academicYear.id,
+                courseType: client_1.CourseType.COURSE,
+                programId: program.id,
+                levelId: level.id,
+            },
+        });
+    }
+    const studentIds = [];
+    for (let i = 1; i <= 5; i++) {
+        const email = `students${i}@test.com`;
+        let studentUser = await prisma.user.findUnique({ where: { email } });
+        if (!studentUser) {
+            studentUser = await prisma.user.create({
+                data: {
+                    email,
+                    password,
+                    role: client_1.Role.STUDENT,
+                    firstName: `Student${i}`,
+                    lastName: 'Test',
+                },
+            });
+            await prisma.student.create({
+                data: {
+                    matricule: `S-000${i}`,
+                    userId: studentUser.id,
+                    departmentId: department.id,
+                    programId: program.id,
+                    groupId: group.id,
+                    academicYearId: academicYear.id,
+                },
+            });
+        }
+        const student = await prisma.student.findUnique({ where: { userId: studentUser.id } });
+        if (student)
+            studentIds.push(student.id);
+    }
+    const now = new Date();
+    const activeSession = await prisma.session.create({
+        data: {
+            type: client_1.SessionType.COURSE,
+            subjectId: subject1.id,
+            teacherId: teacher.id,
+            groupId: group.id,
+            roomId: room.id,
+            adminId: admin.id,
+            startDate: new Date(now.getTime() - 30 * 60 * 1000),
+            endDate: new Date(now.getTime() + 90 * 60 * 1000),
+        },
+    });
+    await prisma.session.create({
+        data: {
+            type: client_1.SessionType.TD,
+            subjectId: subject2.id,
+            teacherId: teacher.id,
+            groupId: group.id,
+            roomId: room.id,
+            adminId: admin.id,
+            startDate: new Date(now.getTime() + 2 * 60 * 60 * 1000),
+            endDate: new Date(now.getTime() + 4 * 60 * 60 * 1000),
+        },
+    });
+    const doneSession = await prisma.session.create({
+        data: {
+            type: client_1.SessionType.COURSE,
+            subjectId: subject2.id,
+            teacherId: teacher.id,
+            groupId: group.id,
+            roomId: room.id,
+            adminId: admin.id,
+            startDate: new Date(now.getTime() - 4 * 60 * 60 * 1000),
+            endDate: new Date(now.getTime() - 2 * 60 * 60 * 1000),
+        },
+    });
+    const yesterday = new Date(now);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdaySession = await prisma.session.create({
+        data: {
+            type: client_1.SessionType.COURSE,
+            subjectId: subject1.id,
+            teacherId: teacher.id,
+            groupId: group.id,
+            roomId: room.id,
+            adminId: admin.id,
+            startDate: new Date(new Date(yesterday).setHours(9, 0, 0, 0)),
+            endDate: new Date(new Date(yesterday).setHours(11, 0, 0, 0)),
+        },
+    });
+    if (studentIds.length >= 5) {
+        for (let i = 0; i < studentIds.length; i++) {
+            await prisma.absence.create({
+                data: {
+                    studentId: studentIds[i],
+                    subjectId: subject2.id,
+                    sessionId: doneSession.id,
+                    status: i < 3 ? 'PRESENT' : 'ABSENT',
+                },
+            });
+        }
+        for (let i = 0; i < studentIds.length; i++) {
+            await prisma.absence.create({
+                data: {
+                    studentId: studentIds[i],
+                    subjectId: subject1.id,
+                    sessionId: yesterdaySession.id,
+                    status: i < 2 ? 'PRESENT' : 'ABSENT',
+                },
+            });
+        }
+        for (const studentId of studentIds) {
+            for (const subjectId of [subject1.id, subject2.id]) {
+                const count = await prisma.absence.count({
+                    where: { studentId, subjectId, status: 'ABSENT' },
+                });
+                await prisma.studentSubjectStatus.upsert({
+                    where: { studentId_subjectId: { studentId, subjectId } },
+                    create: { studentId, subjectId, absenceCount: count, eliminated: count >= 3 },
+                    update: { absenceCount: count, eliminated: count >= 3 },
+                });
+            }
+        }
+    }
+    console.log('✅ Seed terminé avec succès');
+    console.log('─────────────────────────────────────────────');
+    console.log('👤 Admin:    admin@test.com      / 123456');
+    console.log('👨‍🏫 Teacher:  teacher1@test.com   / 123456');
+    console.log('👨‍🎓 Students: students1-5@test.com / 123456');
+    console.log('─────────────────────────────────────────────');
+    console.log(`📅 ACTIVE session ID:    ${activeSession.id}`);
+    console.log(`📅 DONE session ID:      ${doneSession.id}`);
+    console.log(`📅 YESTERDAY session ID: ${yesterdaySession.id}`);
+}
+main()
+    .catch((e) => {
+    console.error(e);
+    process.exit(1);
+})
+    .finally(async () => {
+    await prisma.$disconnect();
+});
+//# sourceMappingURL=seed.js.map

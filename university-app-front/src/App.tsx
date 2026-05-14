@@ -1,121 +1,123 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { Navigate, Route, Routes } from "react-router-dom";
+import ProtectedRoute from "./routes/ProtectedRoute";
+import { ROLES } from "./constants/constants";
+import {
+  AUTH,
+  DASHBOARD,
+  USER_DASHBOARD,
+  HOME,
+  NOTFOUND,
+  GRADES,
+  COURSES,
+  PRESENCE,
+  ANNOUNCEMENTS,
+  REQUESTS,
+  TIMETABLE,
+} from "./routes/routes";
+import ToastContainer from "./Components/Toasts/toast";
+import LoginPage from "./pages/LoginPage/loginPage";
+import TeacherDashboard from "./pages/TeacherDashboard";
+import StudentDashboardPage from "./pages/StudentDashboard/StudentDashboardPage";
+import GradesPage from "./pages/GradesPage/GradesPage";
+import CoursesPage from "./pages/CoursesPage/CoursesPage";
+import PresencePage from "./pages/PresencePage/PresencePage";
+import TimetablePage from "./pages/TimetablePage/TimetablePage";
+import NotFoundPage from "./pages/NotFoundPage/NotFoundPage";
+import AnnouncementsPage from "./pages/AnnouncementsPage/AnnouncementsPage";
+import AppLayout from "./Components/layout/AppLayout";
+import RequestsPage from "./pages/RequestsPage/RequestsPage";
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
     <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+      <ToastContainer />
+      <Routes>
+        <Route path={HOME} element={<Navigate to={AUTH} replace />} />
+        <Route path={AUTH} element={<LoginPage />} />
 
-      <div className="ticks"></div>
+        {/* Teacher routes */}
+        <Route element={<ProtectedRoute allowedRoles={[ROLES.TEACHER]} />}>
+          <Route
+            path={DASHBOARD}
+            element={
+              <AppLayout>
+                <TeacherDashboard />
+              </AppLayout>
+            }
+          />
+        </Route>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+        <Route element={<ProtectedRoute allowedRoles={[ROLES.TEACHER, ROLES.STUDENT]} />}>
+          <Route
+            path={TIMETABLE}
+            element={
+              <AppLayout>
+                <TimetablePage />
+              </AppLayout>
+            }
+          />
+        </Route>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
+        {/* Student routes */}
+        <Route element={<ProtectedRoute allowedRoles={[ROLES.STUDENT]} />}>
+          <Route
+            path={USER_DASHBOARD}
+            element={
+              <AppLayout>
+                <StudentDashboardPage />
+              </AppLayout>
+            }
+          />
+          <Route
+            path={REQUESTS}
+            element={
+              <AppLayout>
+                <RequestsPage />
+              </AppLayout>
+            }
+          />
+        </Route>
+
+        {/* Shared routes for Teacher and Student */}
+        <Route element={<ProtectedRoute allowedRoles={[ROLES.TEACHER, ROLES.STUDENT]} />}>
+          <Route
+            path={COURSES}
+            element={
+              <AppLayout>
+                <CoursesPage />
+              </AppLayout>
+            }
+          />
+          <Route
+            path={GRADES}
+            element={
+              <AppLayout>
+                <GradesPage />
+              </AppLayout>
+            }
+          />
+          <Route
+            path={ANNOUNCEMENTS}
+            element={
+              <AppLayout>
+                <AnnouncementsPage />
+              </AppLayout>
+            }
+          />
+          <Route
+            path={PRESENCE}
+            element={
+              <AppLayout>
+                <PresencePage />
+              </AppLayout>
+            }
+          />
+        </Route>
+
+        <Route path={NOTFOUND} element={<NotFoundPage />} />
+      </Routes>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
